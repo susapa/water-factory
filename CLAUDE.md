@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Water Factory Management System
 
+**GitHub:** https://github.com/susapa/water-factory
+
 ## Stack
 - **Frontend:** Angular 21, PrimeNG 21 (Aura theme), SCSS แยกไฟล์, standalone components, port 4200
 - **Backend:** Go 1.25 + Gin, port 8080
