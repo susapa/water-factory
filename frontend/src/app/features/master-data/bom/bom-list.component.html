@@ -1,0 +1,121 @@
+<p-toast />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาสินค้าสำเร็จรูป..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้าง BOM
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>สินค้าสำเร็จรูป</th><th>ชื่อ</th><th>Version</th>
+      <th>วันที่มีผล</th><th>จำนวนรายการ</th><th>สถานะ</th>
+      <th style="width:80px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.fg_code }}</code></td>
+      <td>{{ item.fg_name }}</td>
+      <td>v{{ item.version }}</td>
+      <td>{{ item.effective_date }}</td>
+      <td>{{ item.lines?.length ?? 0 }} รายการ</td>
+      <td><p-tag [value]="item.is_active ? 'ใช้งาน' : 'ปิด'" [severity]="item.is_active ? 'success' : 'secondary'" /></td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="แก้ไข" (click)="openEdit(item)">
+            <span class="pi pi-pencil"></span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="7" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showDialog" [header]="dialogTitle" [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <div class="form-field full-width">
+        <label>สินค้าสำเร็จรูป <span class="req">*</span></label>
+        <p-select formControlName="finished_good_id" [options]="finishedGoods()" optionLabel="name" optionValue="id"
+          placeholder="เลือกสินค้า" [filter]="true" filterBy="name,code" />
+        @if (form.get('finished_good_id')?.invalid && form.get('finished_good_id')?.touched) {
+          <small class="error">กรุณาเลือกสินค้าสำเร็จรูป</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>Version <span class="req">*</span></label>
+        <p-inputnumber formControlName="version" [min]="1" [useGrouping]="false" />
+      </div>
+      <div class="form-field">
+        <label>วันที่มีผล <span class="req">*</span></label>
+        <input type="date" formControlName="effective_date"
+          style="width:100%;padding:0.5rem 0.75rem;border:1px solid var(--surface-border);border-radius:6px;font-size:0.875rem;" />
+        @if (form.get('effective_date')?.invalid && form.get('effective_date')?.touched) {
+          <small class="error">กรุณาเลือกวันที่</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>สถานะ</label>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding-top:0.4rem;">
+          <input type="checkbox" formControlName="is_active" id="bomActive" />
+          <label for="bomActive" style="margin:0;">ใช้งาน</label>
+        </div>
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุ</label>
+        <input pInputText formControlName="notes" placeholder="หมายเหตุ BOM" />
+      </div>
+    </div>
+
+    <div class="lines-section">
+      <div class="lines-header">
+        <h4>รายการวัตถุดิบ</h4>
+        <button type="button" class="btn-secondary" style="margin-left:auto" (click)="addLine()">
+          <span class="pi pi-plus"></span> เพิ่มรายการ
+        </button>
+      </div>
+
+      @if (lines.length === 0) {
+        <p style="color:var(--text-color-secondary);font-size:0.875rem;">ยังไม่มีรายการ กดเพิ่มรายการวัตถุดิบ</p>
+      }
+
+      <div formArrayName="lines">
+        @for (line of lines.controls; track $index) {
+          <div [formGroupName]="$index" class="line-row">
+            <div class="form-field" style="margin:0">
+              <p-select formControlName="raw_material_id" [options]="rawMaterials()"
+                optionLabel="name" optionValue="id" placeholder="เลือกวัตถุดิบ"
+                [filter]="true" filterBy="name,code" />
+              @if (line.get('raw_material_id')?.invalid && line.get('raw_material_id')?.touched) {
+                <small class="error">กรุณาเลือก</small>
+              }
+            </div>
+            <div class="form-field" style="margin:0">
+              <p-inputnumber formControlName="qty_per_unit" placeholder="จำนวน/หน่วย"
+                [minFractionDigits]="0" [maxFractionDigits]="4" [min]="0.0001" />
+            </div>
+            <div class="form-field" style="margin:0">
+              <p-inputnumber formControlName="waste_factor" placeholder="waste"
+                [minFractionDigits]="0" [maxFractionDigits]="4" [min]="0" [max]="1" />
+            </div>
+            <button type="button" class="btn-icon" style="color:#e53e3e" (click)="removeLine($index)" title="ลบ">
+              <span class="pi pi-trash"></span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="save()">บันทึก</button>
+  </ng-template>
+</p-dialog>

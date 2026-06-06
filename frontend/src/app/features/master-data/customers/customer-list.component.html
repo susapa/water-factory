@@ -1,0 +1,84 @@
+<p-toast />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหารหัส / ชื่อ..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> เพิ่มลูกค้า
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>รหัส</th><th>ชื่อ</th><th>เลขผู้เสียภาษี</th><th>โทร</th>
+      <th>วงเงินเครดิต</th><th>เครดิต (วัน)</th><th>สถานะ</th>
+      <th style="width:120px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.code }}</code></td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.tax_id || '-' }}</td>
+      <td>{{ item.phone || '-' }}</td>
+      <td>{{ item.credit_limit | number:'1.2-2' }}</td>
+      <td>{{ item.credit_days }}</td>
+      <td><p-tag [value]="item.is_active ? 'ใช้งาน' : 'ปิด'" [severity]="item.is_active ? 'success' : 'secondary'" /></td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="แก้ไข" (click)="openEdit(item)"><span class="pi pi-pencil"></span></button>
+          <button class="btn-icon" [title]="item.is_active ? 'ปิด' : 'เปิด'" (click)="toggleActive(item)">
+            <span [class]="item.is_active ? 'pi pi-eye-slash' : 'pi pi-eye'"></span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="8" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showDialog" [header]="dialogTitle" [modal]="true" [style]="{ width: '560px' }" [draggable]="false">
+  <form [formGroup]="form" class="form-grid">
+    <div class="form-field">
+      <label>รหัสลูกค้า <span class="req">*</span></label>
+      <input pInputText formControlName="code" placeholder="เช่น CU-001" />
+      @if (form.get('code')?.invalid && form.get('code')?.touched) { <small class="error">กรุณากรอกรหัส</small> }
+    </div>
+    <div class="form-field">
+      <label>ชื่อ <span class="req">*</span></label>
+      <input pInputText formControlName="name" placeholder="ชื่อลูกค้า / บริษัท" />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) { <small class="error">กรุณากรอกชื่อ</small> }
+    </div>
+    <div class="form-field">
+      <label>เลขผู้เสียภาษี</label>
+      <input pInputText formControlName="tax_id" placeholder="0000000000000" />
+    </div>
+    <div class="form-field">
+      <label>เบอร์โทร</label>
+      <input pInputText formControlName="phone" placeholder="02-xxx-xxxx" />
+    </div>
+    <div class="form-field">
+      <label>อีเมล</label>
+      <input pInputText formControlName="email" placeholder="example@email.com" />
+    </div>
+    <div class="form-field">
+      <label>วงเงินเครดิต</label>
+      <p-inputnumber formControlName="credit_limit" [minFractionDigits]="2" [maxFractionDigits]="2" [min]="0" />
+    </div>
+    <div class="form-field">
+      <label>เครดิต (วัน)</label>
+      <p-inputnumber formControlName="credit_days" [min]="0" [useGrouping]="false" />
+    </div>
+    <div class="form-field full-width">
+      <label>ที่อยู่</label>
+      <textarea pTextarea rows="3" formControlName="address" placeholder="ที่อยู่สำหรับออกใบกำกับ"></textarea>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="save()">บันทึก</button>
+  </ng-template>
+</p-dialog>

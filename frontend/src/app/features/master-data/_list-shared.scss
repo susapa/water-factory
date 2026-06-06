@@ -1,0 +1,148 @@
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  .search-input {
+    flex: 1;
+    max-width: 320px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: var(--surface-card);
+    color: var(--text-color);
+    outline: none;
+
+    &:focus {
+      border-color: var(--primary-color);
+    }
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-left: auto;
+
+  &:hover { opacity: 0.85; }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface-200, #e2e8f0);
+  color: var(--text-color);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.8; }
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 4px;
+  color: var(--text-color-secondary);
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--primary-color);
+  }
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+// Form inside dialog
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &.full-width { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-color-secondary);
+  }
+
+  .req { color: #e53e3e; }
+
+  input, textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: var(--surface-card);
+    color: var(--text-color);
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: var(--primary-color); }
+  }
+
+  textarea { resize: vertical; }
+
+  .error {
+    color: #e53e3e;
+    font-size: 0.75rem;
+  }
+
+  // PrimeNG select/inputnumber full width
+  p-select, p-inputnumber {
+    display: block;
+    width: 100%;
+  }
+}
+
+// BOM lines table inside dialog
+.lines-section {
+  margin-top: 1rem;
+
+  .lines-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+
+    h4 { margin: 0; font-size: 0.875rem; }
+  }
+}
+
+.line-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px 36px;
+  gap: 0.5rem;
+  align-items: start;
+  margin-bottom: 0.5rem;
+}
