@@ -1,0 +1,49 @@
+@use '../../master-data/list-shared' as *;
+
+.stock-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panel-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-color);
+}
+
+.selected-row {
+  background: var(--primary-50, #eff6ff) !important;
+}
+
+.lots-panel {
+  border-top: 2px solid var(--surface-border);
+  padding-top: 1rem;
+}
+
+.expiry-warning td {
+  background: #fefce8 !important;
+}
+
+.expiry-danger td {
+  background: #fef2f2 !important;
+}
+
+.lot-detail {
+  padding: 0.25rem 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  margin-right: 0.35rem;
+}
