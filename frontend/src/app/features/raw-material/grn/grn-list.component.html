@@ -1,0 +1,148 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลข GRN / ซัพพลายเออร์..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้าง GRN
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>เลข GRN</th>
+      <th>ซัพพลายเออร์</th>
+      <th>วันที่รับ</th>
+      <th>เลขอ้างอิง PO</th>
+      <th>สถานะ</th>
+      <th style="width:160px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.grn_number }}</code></td>
+      <td>{{ item.supplier_name || '-' }}</td>
+      <td>{{ item.received_date }}</td>
+      <td>{{ item.po_reference || '-' }}</td>
+      <td>
+        <p-tag [value]="grnStatusLabel(item.status)" [severity]="grnStatusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="ดู/แก้ไข" (click)="openView(item)">
+            <span class="pi pi-eye"></span>
+          </button>
+          @if (item.status === 'draft') {
+            <button class="btn-icon" style="color:#16a34a" title="ยืนยัน GRN" (click)="confirmGRN(item)">
+              <span class="pi pi-check"></span>
+            </button>
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancelGRN(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="6" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showDialog" [header]="dialogTitle" [modal]="true" [style]="{ width: '900px' }" [draggable]="false">
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>ซัพพลายเออร์</label>
+        <p-select formControlName="supplier_id" [options]="suppliers()" optionLabel="name" optionValue="id"
+          placeholder="เลือกซัพพลายเออร์" [filter]="true" filterBy="name,code" [showClear]="true" />
+      </div>
+      <div class="form-field">
+        <label>วันที่รับ <span class="req">*</span></label>
+        <input type="date" formControlName="received_date" class="date-input" />
+        @if (form.get('received_date')?.invalid && form.get('received_date')?.touched) {
+          <small class="error">กรุณาเลือกวันที่</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>เลขอ้างอิง PO</label>
+        <input pInputText formControlName="po_reference" placeholder="เลข PO (ถ้ามี)" />
+      </div>
+      <div class="form-field">
+        <label>หมายเหตุ</label>
+        <input pInputText formControlName="notes" placeholder="หมายเหตุ" />
+      </div>
+    </div>
+
+    <div class="lines-section">
+      <div class="lines-header">
+        <h4>รายการวัตถุดิบที่รับ</h4>
+        @if (!viewOnly) {
+          <button type="button" class="btn-secondary" (click)="addLine()">
+            <span class="pi pi-plus"></span> เพิ่มรายการ
+          </button>
+        }
+      </div>
+
+      <div class="grn-line-header">
+        <span>วัตถุดิบ</span>
+        <span>เลข Lot</span>
+        <span>จำนวน <span class="req">*</span></span>
+        <span>ราคาต่อหน่วย</span>
+        <span>วันหมดอายุ</span>
+        <span>ตำแหน่งคลัง</span>
+        <span>หมายเหตุ</span>
+        <span></span>
+      </div>
+
+      <div formArrayName="lines">
+        @for (line of lines.controls; track $index) {
+          <div [formGroupName]="$index" class="grn-line-row">
+            <div class="form-field" style="margin:0">
+              <p-select formControlName="raw_material_id" [options]="rawMaterials()"
+                optionLabel="name" optionValue="id" placeholder="เลือกวัตถุดิบ"
+                [filter]="true" filterBy="name,code" />
+              @if (line.get('raw_material_id')?.invalid && line.get('raw_material_id')?.touched) {
+                <small class="error">กรุณาเลือก</small>
+              }
+            </div>
+            <input pInputText formControlName="lot_number" placeholder="(ระบบสร้างให้อัตโนมัติ)" class="line-input" />
+            <div class="form-field" style="margin:0">
+              <p-inputnumber formControlName="received_qty" placeholder="0.000"
+                [minFractionDigits]="0" [maxFractionDigits]="3" [min]="0.001" />
+              @if (line.get('received_qty')?.invalid && line.get('received_qty')?.touched) {
+                <small class="error">ต้องมากกว่า 0</small>
+              }
+            </div>
+            <p-inputnumber formControlName="unit_cost" placeholder="0.0000"
+              [minFractionDigits]="0" [maxFractionDigits]="4" [min]="0" />
+            <input type="date" formControlName="expiry_date" class="line-input date-input" />
+            <p-select formControlName="location_id" [options]="locationOptions()"
+              optionLabel="label" optionValue="value" placeholder="ตำแหน่ง" [showClear]="true" />
+            <input pInputText formControlName="notes" placeholder="หมายเหตุ" class="line-input" />
+            @if (!viewOnly) {
+              <button type="button" class="btn-icon" style="color:#e53e3e" (click)="removeLine($index)" title="ลบ">
+                <span class="pi pi-trash"></span>
+              </button>
+            } @else {
+              <span></span>
+            }
+          </div>
+        }
+      </div>
+
+      @if (lines.length === 0) {
+        <p style="color:var(--text-color-secondary);font-size:0.875rem;margin-top:0.5rem;">ยังไม่มีรายการ</p>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">{{ viewOnly ? 'ปิด' : 'ยกเลิก' }}</button>
+    @if (!viewOnly) {
+      <button class="btn-primary" (click)="save()">บันทึก</button>
+    }
+  </ng-template>
+</p-dialog>

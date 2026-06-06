@@ -1,0 +1,157 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลขที่ / ประเภท..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้างใบปรับปรุงสต็อก
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>เลขที่</th>
+      <th>วันที่</th>
+      <th>ประเภท</th>
+      <th>จำนวนรายการ</th>
+      <th>ผู้ดำเนินการ</th>
+      <th>ผู้อนุมัติ</th>
+      <th>สถานะ</th>
+      <th style="width:120px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.adj_number }}</code></td>
+      <td>{{ item.adjustment_date }}</td>
+      <td>{{ typeLabel(item.type) }}</td>
+      <td>{{ item.lines?.length ?? 0 }} รายการ</td>
+      <td>{{ item.performed_by_name || '-' }}</td>
+      <td>{{ item.approved_by_name || '-' }}</td>
+      <td>
+        <p-tag [value]="adjStatusLabel(item.status)" [severity]="adjStatusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="ดูรายละเอียด" (click)="openView(item)">
+            <span class="pi pi-eye"></span>
+          </button>
+          @if (item.status === 'pending' && canApprove()) {
+            <button class="btn-icon" style="color:#16a34a" title="อนุมัติ" (click)="approveAdj(item)">
+              <span class="pi pi-check"></span>
+            </button>
+          }
+          @if (item.status === 'pending') {
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancelAdj(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="8" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showDialog" [header]="dialogTitle" [modal]="true" [style]="{ width: '820px' }" [draggable]="false">
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>วันที่ <span class="req">*</span></label>
+        <input type="date" formControlName="adjustment_date" class="date-input" />
+        @if (form.get('adjustment_date')?.invalid && form.get('adjustment_date')?.touched) {
+          <small class="error">กรุณาเลือกวันที่</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>ประเภท <span class="req">*</span></label>
+        <p-select formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" />
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุ</label>
+        <input pInputText formControlName="notes" placeholder="หมายเหตุ" />
+      </div>
+    </div>
+
+    <div class="lines-section">
+      <div class="lines-header">
+        <h4>รายการปรับปรุง</h4>
+        @if (!viewOnly) {
+          <button type="button" class="btn-secondary" (click)="addLine()">
+            <span class="pi pi-plus"></span> เพิ่มรายการ
+          </button>
+        }
+      </div>
+
+      <div class="adj-line-header">
+        <span>Lot</span>
+        <span style="text-align:right">ปริมาณในระบบ</span>
+        <span style="text-align:right">จำนวนที่นับได้ <span class="req">*</span></span>
+        <span style="text-align:right">ผลต่าง</span>
+        <span>เหตุผล</span>
+        <span></span>
+      </div>
+
+      <div formArrayName="lines">
+        @for (line of lines.controls; track $index) {
+          <div [formGroupName]="$index" class="adj-line-row">
+            @if (viewOnly && editingAdj()) {
+              <span class="lot-label">{{ editingAdj()!.lines[$index]?.lot_number }} — {{ editingAdj()!.lines[$index]?.rm_name }}</span>
+              <span style="text-align:right">{{ editingAdj()!.lines[$index]?.system_qty | number:'1.0-3' }}</span>
+              <span style="text-align:right">{{ editingAdj()!.lines[$index]?.counted_qty | number:'1.0-3' }}</span>
+              <span style="text-align:right" [class]="varianceClass(editingAdj()!.lines[$index]?.variance_qty ?? 0)">
+                {{ (editingAdj()!.lines[$index]?.variance_qty ?? 0) > 0 ? '+' : '' }}{{ editingAdj()!.lines[$index]?.variance_qty ?? 0 | number:'1.0-3' }}
+              </span>
+              <span>{{ editingAdj()!.lines[$index]?.reason || '-' }}</span>
+              <span></span>
+            } @else {
+              <div class="form-field" style="margin:0">
+                <p-select formControlName="rm_stock_lot_id" [options]="lots()" optionLabel="lot_number" optionValue="id"
+                  placeholder="เลือก Lot" [filter]="true" filterBy="lot_number,rm_code,rm_name"
+                  [optionLabel]="'lot_number'" />
+                @if (line.get('rm_stock_lot_id')?.invalid && line.get('rm_stock_lot_id')?.touched) {
+                  <small class="error">กรุณาเลือก Lot</small>
+                }
+              </div>
+              <span style="text-align:right;font-size:0.875rem;color:var(--text-color-secondary);padding-top:0.5rem;">
+                {{ getSystemQty(line.get('rm_stock_lot_id')?.value) ?? '-' }}
+              </span>
+              <div class="form-field" style="margin:0">
+                <p-inputnumber formControlName="counted_qty" placeholder="0.000"
+                  [minFractionDigits]="0" [maxFractionDigits]="3" [min]="0" />
+                @if (line.get('counted_qty')?.invalid && line.get('counted_qty')?.touched) {
+                  <small class="error">กรุณากรอก</small>
+                }
+              </div>
+              <span style="text-align:right;font-size:0.875rem;padding-top:0.5rem;">
+                @if (line.get('rm_stock_lot_id')?.value && line.get('counted_qty')?.value !== null) {
+                  @let variance = (line.get('counted_qty')?.value ?? 0) - (getSystemQty(line.get('rm_stock_lot_id')?.value) ?? 0);
+                  <span [class]="varianceClass(variance)">{{ variance > 0 ? '+' : '' }}{{ variance | number:'1.0-3' }}</span>
+                }
+              </span>
+              <input pInputText formControlName="reason" placeholder="เหตุผล" class="line-input" />
+              <button type="button" class="btn-icon" style="color:#e53e3e" (click)="removeLine($index)" title="ลบ">
+                <span class="pi pi-trash"></span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (lines.length === 0) {
+        <p style="color:var(--text-color-secondary);font-size:0.875rem;margin-top:0.5rem;">ยังไม่มีรายการ</p>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">{{ viewOnly ? 'ปิด' : 'ยกเลิก' }}</button>
+    @if (!viewOnly) {
+      <button class="btn-primary" (click)="save()">บันทึก</button>
+    }
+  </ng-template>
+</p-dialog>

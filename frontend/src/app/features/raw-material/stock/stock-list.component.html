@@ -1,0 +1,134 @@
+<p-toast />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหารหัส / ชื่อวัตถุดิบ..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+</div>
+
+<div class="stock-layout">
+  <!-- Summary Table -->
+  <div class="summary-panel">
+    <h4 class="panel-title">สรุปสต็อกวัตถุดิบ (available)</h4>
+    <p-table [value]="filteredSummary()" [loading]="loadingSummary()" styleClass="p-datatable-sm"
+      selectionMode="single" [(selection)]="selectedSummary" (onRowSelect)="selectRM($any($event.data))" [paginator]="true" [rows]="20">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>รหัส</th>
+          <th>ชื่อวัตถุดิบ</th>
+          <th>หน่วย</th>
+          <th style="text-align:right">จำนวนรวม</th>
+          <th style="text-align:center">Lots</th>
+          <th>หมดอายุเร็วสุด</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr [pSelectableRow]="item" [class.selected-row]="selectedRMId === item.raw_material_id"
+          style="cursor:pointer">
+          <td><code>{{ item.rm_code }}</code></td>
+          <td>{{ item.rm_name }}</td>
+          <td>{{ item.uom_code }}</td>
+          <td style="text-align:right">{{ item.total_qty | number:'1.0-3' }}</td>
+          <td style="text-align:center">{{ item.lot_count }}</td>
+          <td>{{ item.earliest_expiry || '-' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="6" style="text-align:center;padding:2rem;">ไม่มีสต็อก</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Lots Table -->
+  @if (selectedSummary) {
+    <div class="lots-panel">
+      <h4 class="panel-title">Lots ของ {{ selectedSummary!.rm_code }} — {{ selectedSummary!.rm_name }}</h4>
+      <p-table [value]="lots()" [loading]="loadingLots()" styleClass="p-datatable-sm" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>เลข Lot</th>
+            <th>วันที่รับ</th>
+            <th>วันหมดอายุ</th>
+            <th>ตำแหน่ง</th>
+            <th style="text-align:right">ปริมาณเริ่มต้น</th>
+            <th style="text-align:right">คงเหลือ</th>
+            <th>สถานะ</th>
+            <th style="width:60px"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-lot>
+          <tr>
+            <td><code>{{ lot.lot_number }}</code></td>
+            <td>{{ lot.received_date }}</td>
+            <td>{{ lot.expiry_date || '-' }}</td>
+            <td>{{ lot.location_label || '-' }}</td>
+            <td style="text-align:right">{{ lot.initial_qty | number:'1.0-3' }}</td>
+            <td style="text-align:right">{{ lot.current_qty | number:'1.0-3' }}</td>
+            <td>
+              <p-tag [value]="lotStatusLabel(lot.status)" [severity]="lotStatusSeverity(lot.status)" />
+            </td>
+            <td>
+              <button class="btn-icon" title="ดูประวัติ" (click)="openLotDetail(lot)">
+                <span class="pi pi-history"></span>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="8" style="text-align:center;padding:2rem;">ไม่มี lots</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</div>
+
+<!-- Lot Detail Dialog -->
+<p-dialog [(visible)]="showLotDialog" header="รายละเอียด Lot" [modal]="true" [style]="{ width: '760px' }" [draggable]="false">
+  @if (selectedLotDetail()) {
+    <div class="lot-detail">
+      <div class="detail-grid">
+        <div><span class="detail-label">เลข Lot:</span> <code>{{ selectedLotDetail()!.lot_number }}</code></div>
+        <div><span class="detail-label">วัตถุดิบ:</span> {{ selectedLotDetail()!.rm_code }} — {{ selectedLotDetail()!.rm_name }}</div>
+        <div><span class="detail-label">วันที่รับ:</span> {{ selectedLotDetail()!.received_date }}</div>
+        <div><span class="detail-label">วันหมดอายุ:</span> {{ selectedLotDetail()!.expiry_date || '-' }}</div>
+        <div><span class="detail-label">ปริมาณเริ่มต้น:</span> {{ selectedLotDetail()!.initial_qty | number:'1.0-3' }} {{ selectedLotDetail()!.uom_code }}</div>
+        <div><span class="detail-label">คงเหลือ:</span> {{ selectedLotDetail()!.current_qty | number:'1.0-3' }} {{ selectedLotDetail()!.uom_code }}</div>
+        <div><span class="detail-label">ตำแหน่ง:</span> {{ selectedLotDetail()!.location_label || '-' }}</div>
+        <div><span class="detail-label">สถานะ:</span>
+          <p-tag [value]="lotStatusLabel(selectedLotDetail()!.status)" [severity]="lotStatusSeverity(selectedLotDetail()!.status)" />
+        </div>
+      </div>
+
+      <h5 style="margin:1rem 0 0.5rem;">ประวัติการเคลื่อนไหว</h5>
+      <p-table [value]="selectedLotDetail()!.movements" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ประเภท</th>
+            <th>อ้างอิง</th>
+            <th style="text-align:right">จำนวน</th>
+            <th style="text-align:right">ก่อน</th>
+            <th style="text-align:right">หลัง</th>
+            <th>ผู้ดำเนินการ</th>
+            <th>เวลา</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mv>
+          <tr>
+            <td>{{ movementTypeLabel(mv.movement_type) }}</td>
+            <td>{{ mv.reference_type || '-' }}</td>
+            <td style="text-align:right">{{ mv.qty | number:'1.0-3' }}</td>
+            <td style="text-align:right">{{ mv.qty_before | number:'1.0-3' }}</td>
+            <td style="text-align:right">{{ mv.qty_after | number:'1.0-3' }}</td>
+            <td>{{ mv.performed_by_name || '-' }}</td>
+            <td>{{ mv.created_at | date:'dd/MM/yy HH:mm' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="7" style="text-align:center;padding:1rem;">ไม่มีประวัติ</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showLotDialog = false">ปิด</button>
+  </ng-template>
+</p-dialog>
