@@ -1,0 +1,58 @@
+/* PrimeIcons loaded via angular.json styles array */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  background: var(--surface-ground);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4 { margin-top: 0; }
+
+:root {
+  --surface-ground: #f8f9fa;
+  --surface-card: #ffffff;
+  --surface-border: #dee2e6;
+  --surface-hover: #f1f3f5;
+  --surface-200: #e9ecef;
+  --primary-color: #3b82f6;
+  --text-color: #212529;
+  --text-color-secondary: #6c757d;
+  --red-500: #ef4444;
+  --red-50: #fef2f2;
+  --red-200: #fecaca;
+  --red-700: #b91c1c;
+}
+
+/* ── PrimeNG dialog mask overlay ── */
+.p-dialog-mask {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ── PrimeNG table sm density ── */
+.p-datatable-sm .p-datatable-tbody > tr > td,
+.p-datatable-sm .p-datatable-thead > tr > th {
+  padding: 0.5rem 0.75rem;
+}
+
+/* ── PrimeNG select / dropdown full width inside form ── */
+.form-field p-select .p-select,
+.form-field p-select {
+  width: 100%;
+}
+
+/* ── PrimeNG inputnumber full width inside form ── */
+.form-field p-inputnumber,
+.form-field p-inputnumber .p-inputnumber {
+  width: 100%;
+}
+
+/* ── PrimeNG toast z-index ── */
+.p-toast {
+  z-index: 9999;
+}
