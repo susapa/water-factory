@@ -1,0 +1,71 @@
+<p-toast />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหา Batch / ใบสั่งผลิต / สินค้า..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15"
+  [expandedRowKeys]="expandedRows" dataKey="id">
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width:3rem"></th>
+      <th>เลข Batch</th>
+      <th>ใบสั่งผลิต</th>
+      <th>สินค้า</th>
+      <th style="text-align:right">ผลผลิต</th>
+      <th style="text-align:right">เสียหาย</th>
+      <th style="text-align:right">สูญเสีย</th>
+      <th>วันผลิต</th>
+      <th>วันหมดอายุ</th>
+      <th>บันทึกโดย</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item let-expanded="expanded">
+    <tr>
+      <td>
+        @if (item.defect_details?.length) {
+          <button class="btn-icon" [pRowToggler]="item">
+            <span [class]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></span>
+          </button>
+        }
+      </td>
+      <td><code>{{ item.batch_number }}</code></td>
+      <td><code>{{ item.order_number }}</code></td>
+      <td>{{ item.fg_name }}</td>
+      <td style="text-align:right">{{ item.yield_qty | number:'1.3-3' }}</td>
+      <td style="text-align:right">{{ item.defect_qty | number:'1.3-3' }}</td>
+      <td style="text-align:right">{{ item.waste_qty | number:'1.3-3' }}</td>
+      <td>{{ item.production_date }}</td>
+      <td>{{ item.expiry_date }}</td>
+      <td>{{ item.recorded_by_name }}</td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="rowexpansion" let-item>
+    <tr>
+      <td colspan="10" style="padding:0 2rem 1rem 3rem">
+        <table class="defect-table">
+          <thead>
+            <tr>
+              <th>ประเภทของเสีย</th>
+              <th style="text-align:right">ปริมาณ</th>
+              <th>รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of item.defect_details; track d.id) {
+              <tr>
+                <td>{{ d.defect_type }}</td>
+                <td style="text-align:right">{{ d.qty | number:'1.3-3' }}</td>
+                <td>{{ d.description || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="10" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>

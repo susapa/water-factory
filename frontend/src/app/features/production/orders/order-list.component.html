@@ -1,0 +1,274 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Header -->
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลขใบสั่งผลิต / สินค้า..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้างใบสั่งผลิต
+  </button>
+</div>
+
+<!-- Orders Table -->
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>หมายเลข</th>
+      <th>สินค้าสำเร็จรูป</th>
+      <th style="text-align:right">แผน (หน่วย)</th>
+      <th style="text-align:right">ผลิตจริง</th>
+      <th>วันที่วางแผน</th>
+      <th>สถานะ</th>
+      <th style="width:200px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.order_number }}</code></td>
+      <td>{{ item.fg_name }}</td>
+      <td style="text-align:right">{{ item.planned_qty | number:'1.3-3' }}</td>
+      <td style="text-align:right">{{ item.actual_yield_qty | number:'1.3-3' }}</td>
+      <td>{{ item.planned_start_date ?? '-' }}</td>
+      <td>
+        <p-tag [value]="statusLabel(item.status)" [severity]="statusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          @if (item.status === 'draft') {
+            <button class="btn-icon" title="แก้ไข" (click)="openEdit(item)">
+              <span class="pi pi-pencil"></span>
+            </button>
+            <button class="btn-icon" style="color:#16a34a" title="ยืนยัน" (click)="confirmOrder(item)">
+              <span class="pi pi-check"></span>
+            </button>
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancelOrder(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+          @if (item.status === 'confirmed') {
+            <button class="btn-icon" title="ดูรายการวัตถุดิบ" (click)="openRequirements(item)">
+              <span class="pi pi-list"></span>
+            </button>
+            <button class="btn-icon" style="color:#d97706" title="เบิกวัตถุดิบ" (click)="openIssueRM(item)">
+              <span class="pi pi-arrow-right-arrow-left"></span>
+            </button>
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancelOrder(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+          @if (item.status === 'rm_issued') {
+            <button class="btn-icon" title="ดูรายการวัตถุดิบ" (click)="openRequirements(item)">
+              <span class="pi pi-list"></span>
+            </button>
+            <button class="btn-icon" style="color:#16a34a" title="เริ่มผลิต" (click)="startProduction(item)">
+              <span class="pi pi-play"></span>
+            </button>
+          }
+          @if (item.status === 'in_progress') {
+            <button class="btn-icon" style="color:#2563eb" title="บันทึกผลผลิต" (click)="openRecordYield(item)">
+              <span class="pi pi-plus-circle"></span>
+            </button>
+            <button class="btn-icon" style="color:#16a34a" title="เสร็จสิ้น" (click)="completeOrder(item)">
+              <span class="pi pi-flag-fill"></span>
+            </button>
+          }
+          @if (item.status === 'completed' || item.status === 'cancelled') {
+            <button class="btn-icon" title="ดูรายการวัตถุดิบ" (click)="openRequirements(item)">
+              <span class="pi pi-list"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="7" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<!-- ── Create / Edit Dialog ───────────────────────────────────────────────── -->
+<p-dialog [(visible)]="showCreateDialog"
+  [header]="isEditMode ? 'แก้ไขใบสั่งผลิต' : 'สร้างใบสั่งผลิต'"
+  [modal]="true" [style]="{ width: '640px' }" [draggable]="false">
+  <form [formGroup]="createForm">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>สินค้าสำเร็จรูป <span class="req">*</span></label>
+        <p-select formControlName="finished_good_id"
+          [options]="fgOptions()" optionLabel="name" optionValue="id"
+          placeholder="เลือกสินค้าสำเร็จรูป" [filter]="true" filterBy="name,code" />
+      </div>
+      <div class="form-field">
+        <label>BOM</label>
+        <p-select formControlName="bom_id"
+          [options]="filteredBoms()" optionLabel="fg_name" optionValue="id"
+          [placeholder]="filteredBoms().length ? 'เลือก BOM' : 'เลือก FG ก่อน'"
+          [showClear]="true">
+          <ng-template pTemplate="selectedItem" let-b>v{{ b?.version }} — {{ b?.fg_name }}</ng-template>
+          <ng-template pTemplate="item" let-b>v{{ b.version }} — {{ b.fg_name }}</ng-template>
+        </p-select>
+      </div>
+      <div class="form-field">
+        <label>จำนวนที่วางแผน <span class="req">*</span></label>
+        <p-inputnumber formControlName="planned_qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0.001" />
+      </div>
+      <div class="form-field"><!-- spacer --></div>
+      <div class="form-field">
+        <label>วันเริ่มผลิต (แผน)</label>
+        <input type="date" formControlName="planned_start_date" />
+      </div>
+      <div class="form-field">
+        <label>วันสิ้นสุด (แผน)</label>
+        <input type="date" formControlName="planned_end_date" />
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุ</label>
+        <textarea formControlName="notes" rows="2"></textarea>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showCreateDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="saveOrder()">บันทึก</button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Requirements Dialog ────────────────────────────────────────────────── -->
+<p-dialog [(visible)]="showRequirementsDialog"
+  header="รายการวัตถุดิบที่ต้องใช้"
+  [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+  @if (selectedOrder()) {
+    <p style="margin:0 0 1rem;font-size:0.875rem;color:var(--text-color-secondary)">
+      ใบสั่งผลิต: <strong>{{ selectedOrder()!.order_number }}</strong> — {{ selectedOrder()!.fg_name }}
+    </p>
+    <table class="req-table">
+      <thead>
+        <tr>
+          <th>วัตถุดิบ</th>
+          <th style="text-align:right">ต้องการ</th>
+          <th style="text-align:right">เบิกแล้ว</th>
+          <th>หน่วย</th>
+          <th>สถานะ</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of selectedOrder()!.requirements; track r.id) {
+          <tr>
+            <td>{{ r.rm_code }} — {{ r.rm_name }}</td>
+            <td style="text-align:right">{{ r.required_qty | number:'1.3-3' }}</td>
+            <td style="text-align:right">{{ r.issued_qty | number:'1.3-3' }}</td>
+            <td>{{ r.uom_code }}</td>
+            <td>
+              <p-tag [value]="reqStatusLabel(r.status)" [severity]="reqStatusSeverity(r.status)" />
+            </td>
+          </tr>
+        }
+        @if (!selectedOrder()!.requirements.length) {
+          <tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text-color-secondary)">
+            ยังไม่มีรายการ (ยืนยันใบสั่งผลิตก่อน)
+          </td></tr>
+        }
+      </tbody>
+    </table>
+  }
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showRequirementsDialog = false">ปิด</button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Issue RM Dialog ────────────────────────────────────────────────────── -->
+<p-dialog [(visible)]="showIssueDialog"
+  header="เบิกวัตถุดิบ (FIFO)"
+  [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+  @if (selectedOrder()) {
+    <p style="margin:0 0 1rem;font-size:0.875rem;color:var(--text-color-secondary)">
+      ใบสั่งผลิต: <strong>{{ selectedOrder()!.order_number }}</strong> — ระบบจะเบิกจาก Lot ที่ใกล้หมดอายุก่อน
+    </p>
+    @for (ctrl of issueLines.controls; track $index; let i = $index) {
+      <div class="issue-row" [formGroup]="$any(ctrl)">
+        <span class="rm-label">{{ ctrl.get('rm_name')?.value }} ({{ ctrl.get('uom_code')?.value }})</span>
+        <span class="rm-qty-info">ต้องการ: {{ ctrl.get('required_qty')?.value | number:'1.3-3' }} / เบิกแล้ว: {{ ctrl.get('issued_qty')?.value | number:'1.3-3' }}</span>
+        <div class="form-field" style="margin:0">
+          <label>จำนวนที่จะเบิก</label>
+          <p-inputnumber formControlName="qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0.001" />
+        </div>
+      </div>
+    }
+  }
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showIssueDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="submitIssueRM()">เบิกวัตถุดิบ</button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Record Yield Dialog ────────────────────────────────────────────────── -->
+<p-dialog [(visible)]="showYieldDialog"
+  header="บันทึกผลผลิต"
+  [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+  <form [formGroup]="yieldForm">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>ผลผลิตที่ได้ <span class="req">*</span></label>
+        <p-inputnumber formControlName="yield_qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0.001" />
+      </div>
+      <div class="form-field">
+        <label>เลข Batch <span class="req">*</span></label>
+        <input type="text" formControlName="batch_number" placeholder="BATCH-001" />
+      </div>
+      <div class="form-field">
+        <label>ปริมาณเสียหาย</label>
+        <p-inputnumber formControlName="defect_qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0" />
+      </div>
+      <div class="form-field">
+        <label>ปริมาณสูญเสีย</label>
+        <p-inputnumber formControlName="waste_qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0" />
+      </div>
+      <div class="form-field">
+        <label>วันที่ผลิต <span class="req">*</span></label>
+        <input type="date" formControlName="production_date" />
+      </div>
+      <div class="form-field">
+        <label>วันหมดอายุ <span class="req">*</span></label>
+        <input type="date" formControlName="expiry_date" />
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุ</label>
+        <textarea formControlName="notes" rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- Defect details -->
+    <div class="lines-section">
+      <div class="lines-header">
+        <h4>รายละเอียดของเสีย (ไม่บังคับ)</h4>
+        <button class="btn-secondary" type="button" (click)="addDefectLine()">
+          <span class="pi pi-plus"></span> เพิ่มรายการ
+        </button>
+      </div>
+      @for (ctrl of defectDetails.controls; track $index; let i = $index) {
+        <div class="defect-row" [formGroup]="$any(ctrl)">
+          <div class="form-field" style="margin:0">
+            <label>ประเภท <span class="req">*</span></label>
+            <input type="text" formControlName="defect_type" placeholder="เช่น แตก, บิ่น" />
+          </div>
+          <div class="form-field" style="margin:0">
+            <label>ปริมาณ <span class="req">*</span></label>
+            <p-inputnumber formControlName="qty" [minFractionDigits]="3" [maxFractionDigits]="3" [min]="0.001" />
+          </div>
+          <div class="form-field" style="margin:0;flex:2">
+            <label>รายละเอียด</label>
+            <input type="text" formControlName="description" />
+          </div>
+          <button class="btn-icon" style="color:#dc2626;margin-top:1.5rem" type="button" (click)="removeDefectLine(i)">
+            <span class="pi pi-trash"></span>
+          </button>
+        </div>
+      }
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showYieldDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="submitYield()">บันทึก</button>
+  </ng-template>
+</p-dialog>
