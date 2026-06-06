@@ -1,0 +1,86 @@
+<p-toast />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาชื่อ / อีเมล / role..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> เพิ่มผู้ใช้
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>ชื่อ-นามสกุล</th>
+      <th>อีเมล</th>
+      <th>บทบาท</th>
+      <th>สถานะ</th>
+      <th style="width:80px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-user>
+    <tr>
+      <td>{{ user.full_name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ roleLabel[user.role] ?? user.role }}</td>
+      <td>
+        <p-tag [value]="user.is_active ? 'ใช้งาน' : 'ปิด'"
+               [severity]="user.is_active ? 'success' : 'secondary'" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" [title]="user.is_active ? 'ปิดการใช้งาน' : 'เปิดการใช้งาน'"
+            (click)="toggleActive(user)">
+            <span [class]="user.is_active ? 'pi pi-eye-slash' : 'pi pi-eye'"></span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="5" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showDialog" header="เพิ่มผู้ใช้ใหม่" [modal]="true" [style]="{ width: '480px' }" [draggable]="false">
+  <form [formGroup]="form" class="form-grid">
+    <div class="form-field full-width">
+      <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+      <input pInputText formControlName="full_name" placeholder="ชื่อ-นามสกุล" />
+      @if (form.get('full_name')?.invalid && form.get('full_name')?.touched) {
+        <small class="error">กรุณากรอกชื่อ</small>
+      }
+    </div>
+
+    <div class="form-field full-width">
+      <label>อีเมล <span class="req">*</span></label>
+      <input pInputText formControlName="email" placeholder="email@example.com" type="email" />
+      @if (form.get('email')?.invalid && form.get('email')?.touched) {
+        <small class="error">กรุณากรอกอีเมลให้ถูกต้อง</small>
+      }
+    </div>
+
+    <div class="form-field full-width">
+      <label>รหัสผ่าน <span class="req">*</span></label>
+      <p-password formControlName="password" placeholder="อย่างน้อย 6 ตัวอักษร"
+        [feedback]="false" [toggleMask]="true" styleClass="w-full" />
+      @if (form.get('password')?.invalid && form.get('password')?.touched) {
+        <small class="error">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</small>
+      }
+    </div>
+
+    <div class="form-field full-width">
+      <label>บทบาท <span class="req">*</span></label>
+      <p-select formControlName="role_id" [options]="roles()" optionLabel="description" optionValue="id"
+        placeholder="เลือกบทบาท" />
+      @if (form.get('role_id')?.invalid && form.get('role_id')?.touched) {
+        <small class="error">กรุณาเลือกบทบาท</small>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="save()">บันทึก</button>
+  </ng-template>
+</p-dialog>

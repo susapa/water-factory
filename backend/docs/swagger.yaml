@@ -1,0 +1,2877 @@
+definitions:
+  domain.Adjustment:
+    properties:
+      adj_number:
+        type: string
+      adjustment_date:
+        type: string
+      approved_by:
+        type: string
+      approved_by_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      lines:
+        items:
+          $ref: '#/definitions/domain.AdjustmentLine'
+        type: array
+      notes:
+        type: string
+      performed_by:
+        type: string
+      performed_by_name:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  domain.AdjustmentLine:
+    properties:
+      adjustment_id:
+        type: string
+      counted_qty:
+        type: number
+      id:
+        type: string
+      lot_number:
+        type: string
+      raw_material_id:
+        type: string
+      reason:
+        type: string
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      rm_stock_lot_id:
+        type: string
+      system_qty:
+        type: number
+      variance_qty:
+        type: number
+    type: object
+  domain.BOM:
+    properties:
+      created_at:
+        type: string
+      effective_date:
+        type: string
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      lines:
+        items:
+          $ref: '#/definitions/domain.BOMLine'
+        type: array
+      notes:
+        type: string
+      version:
+        type: integer
+    type: object
+  domain.BOMLine:
+    properties:
+      bom_id:
+        type: string
+      id:
+        type: string
+      qty_per_unit:
+        type: number
+      raw_material_id:
+        type: string
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      waste_factor:
+        type: number
+    type: object
+  domain.Customer:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      credit_days:
+        type: integer
+      credit_limit:
+        type: number
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.DefectDetail:
+    properties:
+      defect_type:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      qty:
+        type: number
+      yield_id:
+        type: string
+    type: object
+  domain.FGAdjustment:
+    properties:
+      adj_number:
+        type: string
+      adjustment_date:
+        type: string
+      approved_by:
+        type: string
+      approved_by_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      lines:
+        items:
+          $ref: '#/definitions/domain.FGAdjustmentLine'
+        type: array
+      notes:
+        type: string
+      performed_by:
+        type: string
+      performed_by_name:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  domain.FGAdjustmentLine:
+    properties:
+      adjustment_id:
+        type: string
+      batch_number:
+        type: string
+      counted_qty:
+        type: number
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      fg_stock_lot_id:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      reason:
+        type: string
+      system_qty:
+        type: number
+      variance_qty:
+        type: number
+    type: object
+  domain.FGStockLot:
+    properties:
+      batch_number:
+        type: string
+      created_at:
+        type: string
+      current_qty:
+        type: number
+      expiry_date:
+        type: string
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      initial_qty:
+        type: number
+      location_id:
+        type: integer
+      location_label:
+        type: string
+      production_date:
+        type: string
+      production_order_id:
+        type: string
+      status:
+        type: string
+      uom_code:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.FGStockLotDetail:
+    properties:
+      batch_number:
+        type: string
+      created_at:
+        type: string
+      current_qty:
+        type: number
+      expiry_date:
+        type: string
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      initial_qty:
+        type: number
+      location_id:
+        type: integer
+      location_label:
+        type: string
+      movements:
+        items:
+          $ref: '#/definitions/domain.FGStockMovement'
+        type: array
+      production_date:
+        type: string
+      production_order_id:
+        type: string
+      status:
+        type: string
+      uom_code:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.FGStockMovement:
+    properties:
+      created_at:
+        type: string
+      fg_stock_lot_id:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      movement_type:
+        type: string
+      notes:
+        type: string
+      performed_by:
+        type: string
+      performed_by_name:
+        type: string
+      qty:
+        type: number
+      qty_after:
+        type: number
+      qty_before:
+        type: number
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+    type: object
+  domain.FGStockSummary:
+    properties:
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      finished_good_id:
+        type: string
+      lot_count:
+        type: integer
+      nearest_expiry:
+        type: string
+      total_qty:
+        type: number
+      uom_code:
+        type: string
+    type: object
+  domain.FinishedGood:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      shelf_life_days:
+        type: integer
+      uom_code:
+        type: string
+      uom_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  domain.GRN:
+    properties:
+      created_at:
+        type: string
+      grn_number:
+        type: string
+      id:
+        type: string
+      lines:
+        items:
+          $ref: '#/definitions/domain.GRNLine'
+        type: array
+      notes:
+        type: string
+      po_reference:
+        type: string
+      received_by:
+        type: string
+      received_by_name:
+        type: string
+      received_date:
+        type: string
+      status:
+        type: string
+      supplier_id:
+        type: string
+      supplier_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.GRNLine:
+    properties:
+      expiry_date:
+        type: string
+      grn_id:
+        type: string
+      id:
+        type: string
+      location_id:
+        type: integer
+      location_label:
+        type: string
+      lot_number:
+        type: string
+      notes:
+        type: string
+      raw_material_id:
+        type: string
+      received_qty:
+        type: number
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      unit_cost:
+        type: number
+    type: object
+  domain.ProductionOrder:
+    properties:
+      actual_end_date:
+        type: string
+      actual_start_date:
+        type: string
+      actual_yield_qty:
+        type: number
+      bom_id:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      created_by_name:
+        type: string
+      defect_qty:
+        type: number
+      fg_code:
+        type: string
+      fg_name:
+        type: string
+      finished_good_id:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      order_number:
+        type: string
+      planned_end_date:
+        type: string
+      planned_qty:
+        type: number
+      planned_start_date:
+        type: string
+      requirements:
+        items:
+          $ref: '#/definitions/domain.ProductionRequirement'
+        type: array
+      sales_order_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      waste_qty:
+        type: number
+    type: object
+  domain.ProductionRequirement:
+    properties:
+      id:
+        type: string
+      issued_qty:
+        type: number
+      production_order_id:
+        type: string
+      raw_material_id:
+        type: string
+      required_qty:
+        type: number
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      status:
+        type: string
+      uom_code:
+        type: string
+    type: object
+  domain.ProductionYield:
+    properties:
+      batch_number:
+        type: string
+      defect_details:
+        items:
+          $ref: '#/definitions/domain.DefectDetail'
+        type: array
+      defect_qty:
+        type: number
+      expiry_date:
+        type: string
+      fg_name:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      order_number:
+        type: string
+      production_date:
+        type: string
+      production_order_id:
+        type: string
+      recorded_at:
+        type: string
+      recorded_by:
+        type: string
+      recorded_by_name:
+        type: string
+      waste_qty:
+        type: number
+      yield_qty:
+        type: number
+    type: object
+  domain.RawMaterial:
+    properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      reorder_qty:
+        type: number
+      uom_code:
+        type: string
+      uom_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  domain.RawMaterialCategory:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  domain.StockLot:
+    properties:
+      created_at:
+        type: string
+      current_qty:
+        type: number
+      expiry_date:
+        type: string
+      grn_line_id:
+        type: string
+      id:
+        type: string
+      initial_qty:
+        type: number
+      location_id:
+        type: integer
+      location_label:
+        type: string
+      lot_number:
+        type: string
+      raw_material_id:
+        type: string
+      received_date:
+        type: string
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      status:
+        type: string
+      unit_cost:
+        type: number
+      uom_code:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.StockLotDetail:
+    properties:
+      created_at:
+        type: string
+      current_qty:
+        type: number
+      expiry_date:
+        type: string
+      grn_line_id:
+        type: string
+      id:
+        type: string
+      initial_qty:
+        type: number
+      location_id:
+        type: integer
+      location_label:
+        type: string
+      lot_number:
+        type: string
+      movements:
+        items:
+          $ref: '#/definitions/domain.StockMovement'
+        type: array
+      raw_material_id:
+        type: string
+      received_date:
+        type: string
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      status:
+        type: string
+      unit_cost:
+        type: number
+      uom_code:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.StockMovement:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      movement_type:
+        type: string
+      notes:
+        type: string
+      performed_by:
+        type: string
+      performed_by_name:
+        type: string
+      qty:
+        type: number
+      qty_after:
+        type: number
+      qty_before:
+        type: number
+      raw_material_id:
+        type: string
+      reference_id:
+        type: string
+      reference_type:
+        type: string
+      rm_stock_lot_id:
+        type: string
+    type: object
+  domain.StockSummary:
+    properties:
+      earliest_expiry:
+        type: string
+      lot_count:
+        type: integer
+      raw_material_id:
+        type: string
+      rm_code:
+        type: string
+      rm_name:
+        type: string
+      total_qty:
+        type: number
+      uom_code:
+        type: string
+    type: object
+  domain.Supplier:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.UnitOfMeasure:
+    properties:
+      code:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  domain.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  domain.WarehouseLocation:
+    properties:
+      bay_no:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      row_no:
+        type: string
+      zone:
+        type: string
+    type: object
+  dto.AdjustmentLineRequest:
+    properties:
+      counted_qty:
+        minimum: 0
+        type: number
+      reason:
+        type: string
+      rm_stock_lot_id:
+        type: string
+    required:
+    - counted_qty
+    - rm_stock_lot_id
+    type: object
+  dto.BOMLineRequest:
+    properties:
+      qty_per_unit:
+        type: number
+      raw_material_id:
+        type: string
+      waste_factor:
+        type: number
+    required:
+    - qty_per_unit
+    - raw_material_id
+    type: object
+  dto.CreateAdjustmentRequest:
+    properties:
+      adjustment_date:
+        type: string
+      lines:
+        items:
+          $ref: '#/definitions/dto.AdjustmentLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      type:
+        enum:
+        - cycle_count
+        - damage
+        - correction
+        type: string
+    required:
+    - adjustment_date
+    - lines
+    - type
+    type: object
+  dto.CreateBOMRequest:
+    properties:
+      effective_date:
+        type: string
+      finished_good_id:
+        type: string
+      is_active:
+        type: boolean
+      lines:
+        items:
+          $ref: '#/definitions/dto.BOMLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      version:
+        minimum: 1
+        type: integer
+    required:
+    - effective_date
+    - finished_good_id
+    - lines
+    - version
+    type: object
+  dto.CreateCustomerRequest:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      credit_days:
+        type: integer
+      credit_limit:
+        type: number
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.CreateFGAdjustmentRequest:
+    properties:
+      adjustment_date:
+        type: string
+      lines:
+        items:
+          $ref: '#/definitions/dto.FGAdjustmentLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      type:
+        enum:
+        - cycle_count
+        - write_off
+        - write_in
+        type: string
+    required:
+    - adjustment_date
+    - lines
+    - type
+    type: object
+  dto.CreateFinishedGoodRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      shelf_life_days:
+        minimum: 1
+        type: integer
+      uom_id:
+        type: integer
+    required:
+    - code
+    - name
+    - shelf_life_days
+    - uom_id
+    type: object
+  dto.CreateGRNRequest:
+    properties:
+      lines:
+        items:
+          $ref: '#/definitions/dto.GRNLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      po_reference:
+        type: string
+      received_date:
+        type: string
+      supplier_id:
+        type: string
+    required:
+    - lines
+    - received_date
+    type: object
+  dto.CreateProductionOrderRequest:
+    properties:
+      bom_id:
+        type: string
+      finished_good_id:
+        type: string
+      notes:
+        type: string
+      planned_end_date:
+        type: string
+      planned_qty:
+        type: number
+      planned_start_date:
+        type: string
+    required:
+    - finished_good_id
+    - planned_qty
+    type: object
+  dto.CreateRawMaterialRequest:
+    properties:
+      category_id:
+        type: integer
+      code:
+        type: string
+      description:
+        type: string
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      reorder_qty:
+        type: number
+      uom_id:
+        type: integer
+    required:
+    - code
+    - name
+    - uom_id
+    type: object
+  dto.CreateSupplierRequest:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.DefectDetailRequest:
+    properties:
+      defect_type:
+        type: string
+      description:
+        type: string
+      qty:
+        type: number
+    required:
+    - defect_type
+    - qty
+    type: object
+  dto.FGAdjustmentLineRequest:
+    properties:
+      counted_qty:
+        minimum: 0
+        type: number
+      fg_stock_lot_id:
+        type: string
+      reason:
+        type: string
+    required:
+    - counted_qty
+    - fg_stock_lot_id
+    type: object
+  dto.GRNLineRequest:
+    properties:
+      expiry_date:
+        type: string
+      location_id:
+        type: integer
+      lot_number:
+        type: string
+      notes:
+        type: string
+      raw_material_id:
+        type: string
+      received_qty:
+        type: number
+      unit_cost:
+        type: number
+    required:
+    - raw_material_id
+    - received_qty
+    type: object
+  dto.IssueRMLine:
+    properties:
+      qty:
+        type: number
+      raw_material_id:
+        type: string
+    required:
+    - qty
+    - raw_material_id
+    type: object
+  dto.IssueRMRequest:
+    properties:
+      lines:
+        items:
+          $ref: '#/definitions/dto.IssueRMLine'
+        minItems: 1
+        type: array
+    required:
+    - lines
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserInfo'
+    type: object
+  dto.RecordYieldRequest:
+    properties:
+      batch_number:
+        type: string
+      defect_details:
+        items:
+          $ref: '#/definitions/dto.DefectDetailRequest'
+        type: array
+      defect_qty:
+        type: number
+      expiry_date:
+        type: string
+      notes:
+        type: string
+      production_date:
+        type: string
+      waste_qty:
+        type: number
+      yield_qty:
+        type: number
+    required:
+    - batch_number
+    - expiry_date
+    - production_date
+    - yield_qty
+    type: object
+  dto.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.UpdateBOMRequest:
+    properties:
+      effective_date:
+        type: string
+      is_active:
+        type: boolean
+      lines:
+        items:
+          $ref: '#/definitions/dto.BOMLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      version:
+        minimum: 1
+        type: integer
+    required:
+    - effective_date
+    - lines
+    - version
+    type: object
+  dto.UpdateCustomerRequest:
+    properties:
+      address:
+        type: string
+      credit_days:
+        type: integer
+      credit_limit:
+        type: number
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateFinishedGoodRequest:
+    properties:
+      description:
+        type: string
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      shelf_life_days:
+        minimum: 1
+        type: integer
+      uom_id:
+        type: integer
+    required:
+    - name
+    - shelf_life_days
+    - uom_id
+    type: object
+  dto.UpdateGRNRequest:
+    properties:
+      lines:
+        items:
+          $ref: '#/definitions/dto.GRNLineRequest'
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      po_reference:
+        type: string
+      received_date:
+        type: string
+      supplier_id:
+        type: string
+    required:
+    - lines
+    - received_date
+    type: object
+  dto.UpdateProductionOrderRequest:
+    properties:
+      notes:
+        type: string
+      planned_end_date:
+        type: string
+      planned_qty:
+        type: number
+      planned_start_date:
+        type: string
+    required:
+    - planned_qty
+    type: object
+  dto.UpdateRawMaterialRequest:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      min_stock_qty:
+        type: number
+      name:
+        type: string
+      reorder_qty:
+        type: number
+      uom_id:
+        type: integer
+    required:
+    - name
+    - uom_id
+    type: object
+  dto.UpdateSupplierRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+    required:
+    - name
+    type: object
+  dto.UserInfo:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      role:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: รับ email + password คืน JWT access/refresh token
+      parameters:
+      - description: ข้อมูลเข้าสู่ระบบ
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: เข้าสู่ระบบ
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Stateless logout — client ลบ token ออกเอง
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: ออกจากระบบ
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: คืน profile ของ user ที่ login อยู่
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.User'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ข้อมูลผู้ใช้ปัจจุบัน
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: แลก refresh token เป็น access token ใหม่
+      parameters:
+      - description: Refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh token
+      tags:
+      - auth
+  /inventory/finished-goods/adjustments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.FGAdjustment'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการปรับปรุงสต็อกสินค้าสำเร็จรูป
+      tags:
+      - inventory-fg
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: FG Adjustment request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateFGAdjustmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.FGAdjustment'
+      security:
+      - BearerAuth: []
+      summary: สร้างใบปรับปรุงสต็อกสินค้าสำเร็จรูป (pending)
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/adjustments/{id}:
+    get:
+      parameters:
+      - description: FG Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FGAdjustment'
+      security:
+      - BearerAuth: []
+      summary: ดูใบปรับปรุงสต็อกสินค้าสำเร็จรูปตาม ID
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/adjustments/{id}/approve:
+    post:
+      parameters:
+      - description: FG Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FGAdjustment'
+      security:
+      - BearerAuth: []
+      summary: อนุมัติใบปรับปรุงสต็อกสินค้าสำเร็จรูป (อัปเดต stock lots)
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/adjustments/{id}/cancel:
+    post:
+      parameters:
+      - description: FG Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ยกเลิกใบปรับปรุงสต็อกสินค้าสำเร็จรูป (pending เท่านั้น)
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/stock/lots:
+    get:
+      parameters:
+      - description: Filter by finished good ID
+        in: query
+        name: finished_good_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.FGStockLot'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการ lots สินค้าสำเร็จรูป (filter ตาม finished_good_id ได้)
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/stock/lots/{id}:
+    get:
+      parameters:
+      - description: FG Stock Lot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FGStockLotDetail'
+      security:
+      - BearerAuth: []
+      summary: ดูรายละเอียด lot สินค้าสำเร็จรูป พร้อม movement history
+      tags:
+      - inventory-fg
+  /inventory/finished-goods/stock/summary:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.FGStockSummary'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สรุปสต็อกสินค้าสำเร็จรูป (grouped by FG)
+      tags:
+      - inventory-fg
+  /inventory/raw-material/adjustments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.Adjustment'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการปรับปรุงสต็อก
+      tags:
+      - inventory-raw-material
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Adjustment request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAdjustmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Adjustment'
+      security:
+      - BearerAuth: []
+      summary: สร้างใบปรับปรุงสต็อก (pending)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/adjustments/{id}:
+    get:
+      parameters:
+      - description: Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Adjustment'
+      security:
+      - BearerAuth: []
+      summary: ดูใบปรับปรุงสต็อกตาม ID
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/adjustments/{id}/approve:
+    post:
+      parameters:
+      - description: Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Adjustment'
+      security:
+      - BearerAuth: []
+      summary: อนุมัติใบปรับปรุงสต็อก (อัปเดต stock lots)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/adjustments/{id}/cancel:
+    post:
+      parameters:
+      - description: Adjustment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ยกเลิกใบปรับปรุงสต็อก (pending เท่านั้น)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/grn:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.GRN'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการใบรับวัตถุดิบ (GRN)
+      tags:
+      - inventory-raw-material
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: GRN request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGRNRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.GRN'
+      security:
+      - BearerAuth: []
+      summary: สร้างใบรับวัตถุดิบ (draft)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/grn/{id}:
+    get:
+      parameters:
+      - description: GRN ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.GRN'
+      security:
+      - BearerAuth: []
+      summary: ดึงใบรับวัตถุดิบตาม ID
+      tags:
+      - inventory-raw-material
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: GRN ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: GRN request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateGRNRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.GRN'
+      security:
+      - BearerAuth: []
+      summary: แก้ไขใบรับวัตถุดิบ (draft เท่านั้น)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/grn/{id}/cancel:
+    post:
+      parameters:
+      - description: GRN ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ยกเลิกใบรับวัตถุดิบ (draft เท่านั้น)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/grn/{id}/confirm:
+    post:
+      parameters:
+      - description: GRN ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.GRN'
+      security:
+      - BearerAuth: []
+      summary: ยืนยันการรับวัตถุดิบ (สร้าง stock lots)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/stock/lots:
+    get:
+      parameters:
+      - description: Filter by raw material ID
+        in: query
+        name: raw_material_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.StockLot'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการ stock lots (ทั้งหมด หรือ filter ตาม raw_material_id)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/stock/lots/{id}:
+    get:
+      parameters:
+      - description: Stock Lot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StockLotDetail'
+      security:
+      - BearerAuth: []
+      summary: ดูรายละเอียด stock lot พร้อม movement history
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/stock/summary:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.StockSummary'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สรุปสต็อกวัตถุดิบปัจจุบัน (grouped by RM)
+      tags:
+      - inventory-raw-material
+  /inventory/raw-material/warehouse-locations:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.WarehouseLocation'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อตำแหน่งคลัง
+      tags:
+      - inventory-raw-material
+  /master-data/bom:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.BOM'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อ BOM ทั้งหมด
+      tags:
+      - master-data
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ข้อมูล BOM + lines
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateBOMRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.BOM'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้าง BOM ใหม่ (พร้อม lines)
+      tags:
+      - master-data
+  /master-data/bom/{id}:
+    get:
+      parameters:
+      - description: BOM ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.BOM'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ดึง BOM ตาม ID (พร้อม lines)
+      tags:
+      - master-data
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: BOM ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ข้อมูล BOM + lines ใหม่
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateBOMRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.BOM'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: แก้ไข BOM (replace lines ทั้งหมด)
+      tags:
+      - master-data
+  /master-data/customers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.Customer'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อลูกค้าทั้งหมด
+      tags:
+      - master-data
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ข้อมูลลูกค้า
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้างลูกค้าใหม่
+      tags:
+      - master-data
+  /master-data/customers/{id}:
+    get:
+      parameters:
+      - description: Customer ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ดึงลูกค้าตาม ID
+      tags:
+      - master-data
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ข้อมูลที่แก้ไข
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: แก้ไขลูกค้า
+      tags:
+      - master-data
+  /master-data/customers/{id}/active:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: สถานะ
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            is_active:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: เปิด/ปิดลูกค้า
+      tags:
+      - master-data
+  /master-data/finished-goods:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.FinishedGood'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อสินค้าสำเร็จรูปทั้งหมด
+      tags:
+      - master-data
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ข้อมูลสินค้า
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateFinishedGoodRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.FinishedGood'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้างสินค้าสำเร็จรูปใหม่
+      tags:
+      - master-data
+  /master-data/finished-goods/{id}:
+    get:
+      parameters:
+      - description: Finished Good ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FinishedGood'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ดึงสินค้าสำเร็จรูปตาม ID
+      tags:
+      - master-data
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Finished Good ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ข้อมูลที่แก้ไข
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateFinishedGoodRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FinishedGood'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: แก้ไขสินค้าสำเร็จรูป
+      tags:
+      - master-data
+  /master-data/finished-goods/{id}/active:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Finished Good ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: สถานะ
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            is_active:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: เปิด/ปิดสินค้าสำเร็จรูป
+      tags:
+      - master-data
+  /master-data/raw-material-categories:
+    get:
+      description: ดึงหมวดหมู่ทั้งหมดสำหรับ dropdown
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.RawMaterialCategory'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อหมวดหมู่วัตถุดิบ
+      tags:
+      - master-data
+  /master-data/raw-materials:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.RawMaterial'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อวัตถุดิบทั้งหมด
+      tags:
+      - master-data
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ข้อมูลวัตถุดิบ
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateRawMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.RawMaterial'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้างวัตถุดิบใหม่
+      tags:
+      - master-data
+  /master-data/raw-materials/{id}:
+    get:
+      parameters:
+      - description: Raw Material ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.RawMaterial'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ดึงวัตถุดิบตาม ID
+      tags:
+      - master-data
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Raw Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ข้อมูลที่แก้ไข
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateRawMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.RawMaterial'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: แก้ไขวัตถุดิบ
+      tags:
+      - master-data
+  /master-data/raw-materials/{id}/active:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Raw Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: สถานะ
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            is_active:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: เปิด/ปิดวัตถุดิบ
+      tags:
+      - master-data
+  /master-data/suppliers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.Supplier'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อซัพพลายเออร์ทั้งหมด
+      tags:
+      - master-data
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ข้อมูลซัพพลายเออร์
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSupplierRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้างซัพพลายเออร์ใหม่
+      tags:
+      - master-data
+  /master-data/suppliers/{id}:
+    get:
+      parameters:
+      - description: Supplier ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Supplier'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ดึงซัพพลายเออร์ตาม ID
+      tags:
+      - master-data
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ข้อมูลที่แก้ไข
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateSupplierRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: แก้ไขซัพพลายเออร์
+      tags:
+      - master-data
+  /master-data/suppliers/{id}/active:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: สถานะ
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            is_active:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: เปิด/ปิดซัพพลายเออร์
+      tags:
+      - master-data
+  /master-data/uom:
+    get:
+      description: ดึง UOM ทั้งหมดสำหรับ dropdown
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.UnitOfMeasure'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อหน่วยนับ (UOM)
+      tags:
+      - master-data
+  /production/orders:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.ProductionOrder'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการใบสั่งผลิต
+      tags:
+      - production
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Production order
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateProductionOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: สร้างใบสั่งผลิต
+      tags:
+      - production
+  /production/orders/{id}:
+    get:
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: ดูใบสั่งผลิต
+      tags:
+      - production
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProductionOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: แก้ไขใบสั่งผลิต (draft เท่านั้น)
+      tags:
+      - production
+  /production/orders/{id}/cancel:
+    post:
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: ยกเลิกใบสั่งผลิต
+      tags:
+      - production
+  /production/orders/{id}/complete:
+    post:
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: เสร็จสิ้นการผลิต
+      tags:
+      - production
+  /production/orders/{id}/confirm:
+    post:
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: ยืนยันใบสั่งผลิต (BOM explosion)
+      tags:
+      - production
+  /production/orders/{id}/issue-rm:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Issue lines
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.IssueRMRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: เบิกวัตถุดิบ (FIFO)
+      tags:
+      - production
+  /production/orders/{id}/record-yield:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Yield data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecordYieldRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.ProductionYield'
+      security:
+      - BearerAuth: []
+      summary: บันทึกผลผลิต
+      tags:
+      - production
+  /production/orders/{id}/start:
+    post:
+      parameters:
+      - description: Production order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ProductionOrder'
+      security:
+      - BearerAuth: []
+      summary: เริ่มผลิต
+      tags:
+      - production
+  /production/yields:
+    get:
+      parameters:
+      - description: Filter by production order ID
+        in: query
+        name: order_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.ProductionYield'
+              type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายการบันทึกผลผลิต
+      tags:
+      - production
+  /roles:
+    get:
+      description: ดึง roles สำหรับ dropdown สร้าง user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อ roles ทั้งหมด
+      tags:
+      - users
+  /users:
+    get:
+      description: ดึงรายชื่อ user ทุกคน (admin only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: รายชื่อผู้ใช้ทั้งหมด
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: สร้าง user account ใหม่ (admin only)
+      parameters:
+      - description: ข้อมูล user
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            email:
+              type: string
+            full_name:
+              type: string
+            password:
+              type: string
+            role_id:
+              type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: สร้างผู้ใช้ใหม่
+      tags:
+      - users
+  /users/{id}/active:
+    put:
+      consumes:
+      - application/json
+      description: Toggle is_active ของ user (admin only)
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: สถานะ
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            is_active:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: เปิด/ปิดการใช้งาน user
+      tags:
+      - users
+swagger: "2.0"

@@ -1,0 +1,13 @@
+@use '../master-data/list-shared' as *;
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  color: var(--text-color);
+}
+
+:host ::ng-deep .p-password {
+  width: 100%;
+  input { width: 100%; }
+}
