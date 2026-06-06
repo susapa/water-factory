@@ -69,34 +69,39 @@ backend/
 │   │   ├── master_data.go      ← UOM, RawMaterial, FinishedGood, BOM, Customer, Supplier
 │   │   ├── raw_material_inventory.go  ← GRN, StockLot, StockMovement, Adjustment ฯลฯ
 │   │   ├── production.go       ← ProductionOrder, ProductionRequirement, ProductionYield, DefectDetail
-│   │   └── fg_inventory.go     ← FGStockLot, FGStockMovement, FGStockSummary, FGAdjustment ฯลฯ
+│   │   ├── fg_inventory.go     ← FGStockLot, FGStockMovement, FGStockSummary, FGAdjustment ฯลฯ
+│   │   └── sales.go            ← SalesOrder, SalesOrderLine, Vehicle, DeliveryOrder, DeliveryOrderLine, Invoice
 │   ├── dto/
 │   │   ├── auth_dto.go
 │   │   ├── master_data_dto.go  ← Create/Update requests for all master data
 │   │   ├── raw_material_inventory_dto.go  ← GRN/Adjustment request DTOs
 │   │   ├── production_dto.go   ← CreateOrder, UpdateOrder, IssueRMRequest, RecordYieldRequest
-│   │   └── fg_inventory_dto.go ← CreateFGAdjustmentRequest, FGAdjustmentLineRequest
+│   │   ├── fg_inventory_dto.go ← CreateFGAdjustmentRequest, FGAdjustmentLineRequest
+│   │   └── sales_dto.go        ← CreateSalesOrderRequest, CreateDeliveryOrderRequest, CreateInvoiceRequest, MarkPaidRequest
 │   ├── repository/
 │   │   ├── user_repo.go
 │   │   ├── master_data_repo.go        ← pgxpool queries, BOM ใช้ transaction
 │   │   ├── raw_material_inventory_repo.go  ← GRN confirm + Adjustment approve transactions
 │   │   ├── production_repo.go         ← ConfirmOrder (BOM explosion), IssueRM (FIFO), RecordYield transactions
 │   │   │                                   RecordYield ยัง insert fg_stock_lot + PRODUCTION_RECEIPT movement ด้วย
-│   │   └── fg_inventory_repo.go       ← ListStockSummary, ListStockLots, GetStockLotDetail, Adjustment CRUD
+│   │   ├── fg_inventory_repo.go       ← ListStockSummary, ListStockLots, GetStockLotDetail, Adjustment CRUD
+│   │   └── sales_repo.go              ← SO CRUD+confirm/cancel, DO create(FEFO)+dispatch+deliver, Invoice create+pay
 │   ├── service/
 │   │   ├── auth_service.go
 │   │   ├── user_service.go
 │   │   ├── master_data_service.go
 │   │   ├── raw_material_inventory_service.go
 │   │   ├── production_service.go
-│   │   └── fg_inventory_service.go
+│   │   ├── fg_inventory_service.go
+│   │   └── sales_service.go
 │   └── handler/
 │       ├── auth_handler.go
 │       ├── user_handler.go
 │       ├── master_data_handler.go         ← 22 handlers พร้อม Swagger annotations
 │       ├── raw_material_inventory_handler.go  ← 15 handlers พร้อม Swagger annotations
 │       ├── production_handler.go          ← 11 handlers พร้อม Swagger annotations
-│       └── fg_inventory_handler.go        ← 8 handlers พร้อม Swagger annotations
+│       ├── fg_inventory_handler.go        ← 8 handlers พร้อม Swagger annotations
+│       └── sales_handler.go               ← 13 handlers พร้อม Swagger annotations
 ├── pkg/
 │   ├── jwt/jwt.go
 │   ├── number/generator.go     ← doc number: GRN-YYYYMMDD-00001, PO-YYYYMMDD-00001 ฯลฯ
@@ -126,6 +131,7 @@ frontend/src/app/
 │       ├── raw-material-inventory.service.ts   ← HTTP service สำหรับ Phase 2
 │       ├── production.service.ts               ← HTTP service สำหรับ Phase 3
 │       ├── finished-goods-inventory.service.ts ← HTTP service สำหรับ Phase 4
+│       ├── sales.service.ts                    ← HTTP service สำหรับ Phase 5
 │       └── user.service.ts                     ← listUsers, createUser, setUserActive, listRoles
 ├── layout/
 │   ├── layout.component.ts/html/scss
@@ -159,7 +165,12 @@ frontend/src/app/
     │   ├── finished-goods.routes.ts
     │   ├── stock/fg-stock-list.component.*   ← stock summary + lot detail (FEFO) + expiry alerts + movement history
     │   └── adjustments/fg-adjustment-list.component.*  ← adjustment create/approve/cancel
-    ├── sales/                  ← placeholder (Phase 5)
+    ├── sales/                  ← ✅ Phase 5 เสร็จแล้ว
+    │   ├── sales-shell.component.*      ← tab navigation (role-aware: delivery เห็นแค่จัดส่ง)
+    │   ├── sales.routes.ts
+    │   ├── orders/so-list.component.*   ← SO create/confirm/cancel + FormArray lines + totals
+    │   ├── deliveries/do-list.component.*  ← DO create(FEFO auto-pick)+dispatch+deliver
+    │   └── invoices/invoice-list.component.*  ← invoice create+pay
     ├── reports/                ← placeholder (Phase 6)
     └── admin/                  ← ✅ Phase 0 เสร็จแล้ว
         └── user-list.component.*  ← ตาราง users + dialog เพิ่มผู้ใช้ + toggle active
@@ -265,9 +276,34 @@ POST /api/v1/inventory/finished-goods/adjustments/:id/approve → อัปเ�
 POST /api/v1/inventory/finished-goods/adjustments/:id/cancel  (pending only)
 ```
 
+### Phase 5 — Sales (sales permission)
+```
+GET  /api/v1/sales/vehicles
+
+# Sales Orders (SO-YYYYMMDD-00001)
+GET  /api/v1/sales/orders
+POST /api/v1/sales/orders                  (create, draft)
+GET  /api/v1/sales/orders/:id
+PUT  /api/v1/sales/orders/:id              (update, draft only)
+POST /api/v1/sales/orders/:id/confirm      → status=confirmed
+POST /api/v1/sales/orders/:id/cancel       (draft/confirmed only)
+
+# Delivery Orders (DO-YYYYMMDD-00001)
+GET  /api/v1/sales/delivery-orders
+POST /api/v1/sales/delivery-orders         (FEFO auto-pick from confirmed SO) → status=pending, SO→picking
+GET  /api/v1/sales/delivery-orders/:id
+POST /api/v1/sales/delivery-orders/:id/dispatch  → deduct fg_stock_lots + SALES_DISPATCH movements, SO→dispatched
+POST /api/v1/sales/delivery-orders/:id/deliver   → status=delivered
+
+# Invoices (INV-YYYYMMDD-00001)
+GET  /api/v1/sales/invoices
+POST /api/v1/sales/invoices                (from dispatched SO) → status=issued, SO→invoiced
+GET  /api/v1/sales/invoices/:id
+POST /api/v1/sales/invoices/:id/pay        → status=paid
+```
+
 ## Phase ที่เหลือ
-- **Phase 5 (ต่อไป):** Sales — orders, delivery, dispatch, Thai tax invoice
-- **Phase 6:** Dashboard — KPI tiles, PrimeNG charts, reports
+- **Phase 6 (ต่อไป):** Dashboard — KPI tiles, PrimeNG charts, reports
 
 ## หน้า Frontend ที่เสร็จแล้ว
 | หน้า | Route | Roles |
@@ -278,6 +314,7 @@ POST /api/v1/inventory/finished-goods/adjustments/:id/cancel  (pending only)
 | คลังวัตถุดิบ (3 tabs) | /raw-material | admin, warehouse_manager, production_manager |
 | การผลิต (2 tabs) | /production | admin, warehouse_manager, production_manager |
 | คลังสินค้าสำเร็จรูป (2 tabs) | /finished-goods | admin, warehouse_manager, sales_admin |
+| ขายและจัดส่ง (3 tabs / 1 tab delivery) | /sales | admin, sales_admin, delivery |
 
 ## Database Tables (ทั้งหมด applied แล้ว)
 Migration 001: roles, users, refresh_tokens, sequences
@@ -324,3 +361,6 @@ Migration 007: fg_adjustments, fg_adjustment_lines
 - **fg_stock_movements.movement_type** CHECK constraint: `'PRODUCTION_RECEIPT','SALES_DISPATCH','RETURN','ADJUSTMENT_IN','ADJUSTMENT_OUT'`
 - `number.Next(ctx, pool, "FGADJ")` → `FGADJ-YYYYMMDD-00001`
 - RecordYield (production_repo.go) ทำงาน atomic: insert production_yield → insert fg_stock_lot → insert fg_stock_movement(PRODUCTION_RECEIPT) ในตัว transaction เดียวกัน
+- **Sales DO dispatch** transaction: update fg_stock_lots.current_qty → insert fg_stock_movements(SALES_DISPATCH) → update SO status=dispatched
+- `number.Next(ctx, pool, "SO")` → `SO-YYYYMMDD-00001`, `"DO"` → `DO-...`, `"INV"` → `INV-...` (auto-insert ลงใน sequences table)
+- **delivery role** เห็นแค่ tab "จัดส่ง" (deliveries) ใน sales shell — ซ่อน orders + invoices ด้วย `isDelivery()` computed signal

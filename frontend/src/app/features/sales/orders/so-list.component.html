@@ -1,0 +1,168 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลขที่ / ลูกค้า / สถานะ..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้างใบสั่งขาย
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>เลขที่ SO</th>
+      <th>ลูกค้า</th>
+      <th>วันที่</th>
+      <th>วันที่ต้องการ</th>
+      <th style="text-align:right">ยอดรวม (บาท)</th>
+      <th>สถานะ</th>
+      <th style="width:130px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.order_number }}</code></td>
+      <td>{{ item.customer_name }}</td>
+      <td>{{ item.order_date }}</td>
+      <td>{{ item.requested_date || '-' }}</td>
+      <td style="text-align:right">{{ item.total_amount | number:'1.2-2' }}</td>
+      <td>
+        <p-tag [value]="statusLabel(item.status)" [severity]="statusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="ดูรายละเอียด" (click)="openView(item)">
+            <span class="pi pi-eye"></span>
+          </button>
+          @if (item.status === 'draft') {
+            <button class="btn-icon" style="color:#16a34a" title="ยืนยัน" (click)="confirm_(item)">
+              <span class="pi pi-check"></span>
+            </button>
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancel(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+          @if (item.status === 'confirmed') {
+            <button class="btn-icon" style="color:#dc2626" title="ยกเลิก" (click)="cancel(item)">
+              <span class="pi pi-times"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="7" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<!-- Create / View Dialog -->
+<p-dialog [(visible)]="showDialog" [header]="dialogTitle" [modal]="true" [style]="{ width: '850px' }" [draggable]="false">
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>ลูกค้า <span class="req">*</span></label>
+        @if (!viewOnly) {
+          <p-select formControlName="customer_id" [options]="customers()" optionLabel="name" optionValue="id"
+            placeholder="เลือกลูกค้า" [filter]="true" filterBy="name" />
+        } @else {
+          <div class="view-value">{{ editingOrder()?.customer_name }}</div>
+        }
+      </div>
+      <div class="form-field">
+        <label>วันที่ <span class="req">*</span></label>
+        @if (!viewOnly) {
+          <input type="date" formControlName="order_date" class="date-input" />
+        } @else {
+          <div class="view-value">{{ editingOrder()?.order_date }}</div>
+        }
+      </div>
+      <div class="form-field">
+        <label>วันที่ต้องการ</label>
+        @if (!viewOnly) {
+          <input type="date" formControlName="requested_date" class="date-input" />
+        } @else {
+          <div class="view-value">{{ editingOrder()?.requested_date || '-' }}</div>
+        }
+      </div>
+      <div class="form-field">
+        <label>VAT (%)</label>
+        @if (!viewOnly) {
+          <p-inputnumber formControlName="vat_rate" [minFractionDigits]="0" [maxFractionDigits]="2" />
+        } @else {
+          <div class="view-value">{{ editingOrder()?.vat_rate }}%</div>
+        }
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุ</label>
+        @if (!viewOnly) {
+          <input pInputText formControlName="notes" placeholder="หมายเหตุ" />
+        } @else {
+          <div class="view-value">{{ editingOrder()?.notes || '-' }}</div>
+        }
+      </div>
+    </div>
+
+    <!-- Lines -->
+    <div class="lines-section">
+      <div class="lines-header">
+        <h4>รายการสินค้า</h4>
+        @if (!viewOnly) {
+          <button type="button" class="btn-secondary" (click)="addLine()">
+            <span class="pi pi-plus"></span> เพิ่มรายการ
+          </button>
+        }
+      </div>
+      <div class="line-table-header">
+        <span>สินค้า</span>
+        <span style="text-align:right">จำนวน</span>
+        <span style="text-align:right">ราคา/หน่วย</span>
+        <span style="text-align:right">ส่วนลด %</span>
+        <span style="text-align:right">รวม</span>
+        @if (!viewOnly) { <span></span> }
+      </div>
+      <div formArrayName="lines">
+        @for (line of lines.controls; track $index) {
+          <div [formGroupName]="$index" class="line-row">
+            @if (viewOnly && editingOrder()) {
+              <span>{{ editingOrder()!.lines[$index]?.fg_name }}</span>
+              <span style="text-align:right">{{ editingOrder()!.lines[$index]?.ordered_qty | number:'1.0-3' }} {{ editingOrder()!.lines[$index]?.uom_code }}</span>
+              <span style="text-align:right">{{ editingOrder()!.lines[$index]?.unit_price | number:'1.2-4' }}</span>
+              <span style="text-align:right">{{ editingOrder()!.lines[$index]?.discount_pct }}%</span>
+              <span style="text-align:right">{{ editingOrder()!.lines[$index]?.line_total | number:'1.2-2' }}</span>
+            } @else {
+              <p-select formControlName="finished_good_id" [options]="fgOptions()" optionLabel="name" optionValue="id"
+                placeholder="เลือกสินค้า" [filter]="true" filterBy="name,code" />
+              <p-inputnumber formControlName="ordered_qty" placeholder="0.000" [minFractionDigits]="0" [maxFractionDigits]="3" [min]="0.001" />
+              <p-inputnumber formControlName="unit_price"  placeholder="0.00"  [minFractionDigits]="2" [maxFractionDigits]="4" [min]="0" />
+              <p-inputnumber formControlName="discount_pct" placeholder="0"   [minFractionDigits]="0" [maxFractionDigits]="2" [min]="0" [max]="100" />
+              <span style="text-align:right;padding-top:0.5rem;font-size:0.875rem">{{ lineTotal($index) | number:'1.2-2' }}</span>
+              <button type="button" class="btn-icon" style="color:#e53e3e" (click)="removeLine($index)">
+                <span class="pi pi-trash"></span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+      @if (lines.length === 0) {
+        <p style="color:var(--text-color-secondary);font-size:0.875rem;margin-top:0.5rem;">ยังไม่มีรายการ</p>
+      }
+
+      <!-- Totals -->
+      <div class="totals-section">
+        <div class="total-row"><span>ราคาก่อน VAT:</span><span>{{ subtotal() | number:'1.2-2' }} บาท</span></div>
+        <div class="total-row"><span>VAT ({{ form.value.vat_rate ?? 7 }}%):</span><span>{{ vatAmount() | number:'1.2-2' }} บาท</span></div>
+        <div class="total-row grand-total"><span>รวมทั้งสิ้น:</span><span>{{ totalAmount() | number:'1.2-2' }} บาท</span></div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDialog = false">{{ viewOnly ? 'ปิด' : 'ยกเลิก' }}</button>
+    @if (!viewOnly) {
+      <button class="btn-primary" (click)="save()">บันทึก</button>
+    }
+  </ng-template>
+</p-dialog>

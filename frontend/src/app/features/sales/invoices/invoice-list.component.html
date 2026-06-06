@@ -1,0 +1,135 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลขที่ INV / SO / ลูกค้า..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-file-plus"></span> ออกใบแจ้งหนี้
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>เลขที่ใบแจ้งหนี้</th>
+      <th>อ้างอิง SO</th>
+      <th>ลูกค้า</th>
+      <th>วันที่ออกใบ</th>
+      <th>ครบกำหนด</th>
+      <th style="text-align:right">ยอดรวม (บาท)</th>
+      <th>สถานะ</th>
+      <th style="width:110px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.invoice_number }}</code></td>
+      <td><code>{{ item.so_number }}</code></td>
+      <td>{{ item.customer_name }}</td>
+      <td>{{ item.invoice_date }}</td>
+      <td>{{ item.due_date || '-' }}</td>
+      <td style="text-align:right">{{ item.total_amount | number:'1.2-2' }}</td>
+      <td>
+        <p-tag [value]="statusLabel(item.status)" [severity]="statusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="ดูรายละเอียด" (click)="openDetail(item)">
+            <span class="pi pi-eye"></span>
+          </button>
+          @if (item.status === 'issued' || item.status === 'overdue') {
+            <button class="btn-icon" style="color:#16a34a" title="บันทึกรับชำระ" (click)="openPay(item)">
+              <span class="pi pi-dollar"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="8" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<!-- Create Invoice Dialog -->
+<p-dialog [(visible)]="showCreateDialog" header="ออกใบแจ้งหนี้" [modal]="true" [style]="{ width: '480px' }" [draggable]="false">
+  <form [formGroup]="createForm">
+    <div class="form-grid">
+      <div class="form-field full-width">
+        <label>ใบสั่งขาย (SO) <span class="req">*</span></label>
+        <p-select formControlName="sales_order_id" [options]="soOptions()" optionLabel="label" optionValue="id"
+          placeholder="เลือก SO ที่จัดส่งแล้ว" [filter]="true" filterBy="label" />
+        @if (createForm.get('sales_order_id')?.invalid && createForm.get('sales_order_id')?.touched) {
+          <small class="error">กรุณาเลือก SO</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>วันที่ออกใบ <span class="req">*</span></label>
+        <input type="date" formControlName="invoice_date" class="date-input" />
+      </div>
+      <div class="form-field">
+        <label>วันครบกำหนด</label>
+        <input type="date" formControlName="due_date" class="date-input" />
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showCreateDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="save()">ออกใบแจ้งหนี้</button>
+  </ng-template>
+</p-dialog>
+
+<!-- Mark Paid Dialog -->
+<p-dialog [(visible)]="showPayDialog" [header]="'บันทึกรับชำระ — ' + (payingInvoice()?.invoice_number ?? '')"
+  [modal]="true" [style]="{ width: '420px' }" [draggable]="false">
+  @if (payingInvoice(); as inv) {
+    <div class="pay-summary">
+      <span>ยอดที่ต้องชำระ:</span>
+      <strong>{{ inv.total_amount | number:'1.2-2' }} บาท</strong>
+    </div>
+  }
+  <form [formGroup]="payForm">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>วันที่รับชำระ <span class="req">*</span></label>
+        <input type="date" formControlName="payment_date" class="date-input" />
+      </div>
+      <div class="form-field">
+        <label>วิธีชำระเงิน</label>
+        <input pInputText formControlName="payment_method" placeholder="เงินสด / โอน / เช็ค" />
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showPayDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="savePay()">บันทึกการรับชำระ</button>
+  </ng-template>
+</p-dialog>
+
+<!-- Invoice Detail Dialog -->
+<p-dialog [(visible)]="showDetailDialog" [header]="'ใบแจ้งหนี้ ' + (detailInvoice()?.invoice_number ?? '')"
+  [modal]="true" [style]="{ width: '500px' }" [draggable]="false">
+  @if (detailInvoice(); as inv) {
+    <div class="inv-detail">
+      <div class="inv-row"><span>อ้างอิง SO:</span><code>{{ inv.so_number }}</code></div>
+      <div class="inv-row"><span>ลูกค้า:</span><span>{{ inv.customer_name }}</span></div>
+      <div class="inv-row"><span>วันที่ออกใบ:</span><span>{{ inv.invoice_date }}</span></div>
+      <div class="inv-row"><span>วันครบกำหนด:</span><span>{{ inv.due_date || '-' }}</span></div>
+      <div class="inv-row"><span>สถานะ:</span><p-tag [value]="statusLabel(inv.status)" [severity]="statusSeverity(inv.status)" /></div>
+      <hr />
+      <div class="inv-row"><span>ราคาก่อน VAT:</span><span>{{ inv.subtotal | number:'1.2-2' }} บาท</span></div>
+      <div class="inv-row"><span>VAT:</span><span>{{ inv.vat_amount | number:'1.2-2' }} บาท</span></div>
+      <div class="inv-row grand"><span>รวมทั้งสิ้น:</span><strong>{{ inv.total_amount | number:'1.2-2' }} บาท</strong></div>
+      @if (inv.status === 'paid') {
+        <hr />
+        <div class="inv-row"><span>วันที่รับชำระ:</span><span>{{ inv.payment_date }}</span></div>
+        <div class="inv-row"><span>วิธีชำระ:</span><span>{{ inv.payment_method || '-' }}</span></div>
+      }
+      <div class="inv-row muted"><span>ออกโดย:</span><span>{{ inv.created_by_name }}</span></div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDetailDialog = false">ปิด</button>
+  </ng-template>
+</p-dialog>

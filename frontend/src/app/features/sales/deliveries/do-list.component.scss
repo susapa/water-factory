@@ -1,0 +1,55 @@
+@use '../../master-data/list-shared' as *;
+
+.date-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--surface-card);
+  color: var(--text-color);
+  &:focus { outline: none; border-color: var(--primary-color); }
+}
+
+.fefo-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--blue-50, #eff6ff);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .pi { color: var(--primary-color); }
+}
+
+.detail-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: var(--surface-ground);
+  border-radius: 8px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  font-weight: 600;
+}
+
+.lines-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}

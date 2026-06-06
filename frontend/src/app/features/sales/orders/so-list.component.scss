@@ -1,0 +1,75 @@
+@use '../../master-data/list-shared' as *;
+
+.date-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--surface-card);
+  color: var(--text-color);
+  &:focus { outline: none; border-color: var(--primary-color); }
+}
+
+.view-value {
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.lines-section {
+  margin-top: 1.25rem;
+
+  .lines-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    h4 { margin: 0; font-size: 0.9rem; }
+  }
+}
+
+.line-table-header {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1fr 1.2fr 36px;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--surface-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.line-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1fr 1.2fr 36px;
+  gap: 0.5rem;
+  align-items: start;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.totals-section {
+  margin-top: 1rem;
+  border-top: 1px solid var(--surface-border);
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.total-row {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.875rem;
+  span:first-child { color: var(--text-color-secondary); min-width: 120px; text-align: right; }
+  span:last-child { min-width: 120px; text-align: right; }
+}
+
+.grand-total {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary-color);
+}

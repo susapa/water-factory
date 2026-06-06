@@ -1,0 +1,151 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="list-header">
+  <input type="text" class="search-input" placeholder="ค้นหาเลขที่ DO / SO / ลูกค้า..."
+    [value]="searchText()" (input)="searchText.set($any($event.target).value)" />
+  <button class="btn-primary" (click)="openCreate()">
+    <span class="pi pi-plus"></span> สร้างใบส่งสินค้า
+  </button>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>เลขที่ DO</th>
+      <th>อ้างอิง SO</th>
+      <th>ลูกค้า</th>
+      <th>วันที่จัดส่ง</th>
+      <th>ทะเบียนรถ</th>
+      <th>จำนวนรายการ</th>
+      <th>สถานะ</th>
+      <th style="width:130px"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td><code>{{ item.do_number }}</code></td>
+      <td><code>{{ item.so_number }}</code></td>
+      <td>{{ item.customer_name }}</td>
+      <td>{{ item.delivery_date || '-' }}</td>
+      <td>{{ item.license_plate || '-' }}</td>
+      <td>{{ item.lines?.length ?? 0 }} lot</td>
+      <td>
+        <p-tag [value]="statusLabel(item.status)" [severity]="statusSeverity(item.status)" />
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="ดูรายละเอียด" (click)="openDetail(item)">
+            <span class="pi pi-eye"></span>
+          </button>
+          @if (item.status === 'pending' || item.status === 'loading') {
+            <button class="btn-icon" style="color:#2563eb" title="จัดส่ง" (click)="dispatch(item)">
+              <span class="pi pi-send"></span>
+            </button>
+          }
+          @if (item.status === 'dispatched') {
+            <button class="btn-icon" style="color:#16a34a" title="ส่งมอบแล้ว" (click)="deliver(item)">
+              <span class="pi pi-check-circle"></span>
+            </button>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="8" style="text-align:center;padding:2rem;">ไม่พบข้อมูล</td></tr>
+  </ng-template>
+</p-table>
+
+<!-- Create Dialog -->
+<p-dialog [(visible)]="showCreateDialog" header="สร้างใบส่งสินค้า" [modal]="true" [style]="{ width: '520px' }" [draggable]="false">
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <div class="form-field full-width">
+        <label>ใบสั่งขาย (SO) <span class="req">*</span></label>
+        <p-select formControlName="sales_order_id" [options]="soOptions()" optionLabel="label" optionValue="id"
+          placeholder="เลือก SO ที่ยืนยันแล้ว" [filter]="true" filterBy="label" />
+        @if (form.get('sales_order_id')?.invalid && form.get('sales_order_id')?.touched) {
+          <small class="error">กรุณาเลือก SO</small>
+        }
+      </div>
+      <div class="form-field">
+        <label>วันที่จัดส่ง</label>
+        <input type="date" formControlName="delivery_date" class="date-input" />
+      </div>
+      <div class="form-field">
+        <label>รถที่ใช้จัดส่ง</label>
+        <p-select formControlName="vehicle_id" [options]="vehicleOptions()" optionLabel="label" optionValue="id"
+          placeholder="เลือกรถ (ถ้ามี)" [showClear]="true" />
+      </div>
+      <div class="form-field full-width">
+        <label>หมายเหตุเส้นทาง</label>
+        <input pInputText formControlName="route_notes" placeholder="หมายเหตุ" />
+      </div>
+    </div>
+    <p class="fefo-note">
+      <span class="pi pi-info-circle"></span>
+      ระบบจะเลือก lot อัตโนมัติตามหลัก FEFO (หมดอายุก่อน จัดส่งก่อน)
+    </p>
+  </form>
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showCreateDialog = false">ยกเลิก</button>
+    <button class="btn-primary" (click)="save()">สร้างใบส่งสินค้า</button>
+  </ng-template>
+</p-dialog>
+
+<!-- Detail Dialog -->
+<p-dialog [(visible)]="showDetailDialog" [header]="'ใบส่งสินค้า ' + (detailDO()?.do_number ?? '')"
+  [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+  @if (detailDO(); as d) {
+    <div class="detail-info">
+      <div class="info-row">
+        <span class="info-label">อ้างอิง SO:</span>
+        <code>{{ d.so_number }}</code>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ลูกค้า:</span>
+        <span>{{ d.customer_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">วันที่จัดส่ง:</span>
+        <span>{{ d.delivery_date || '-' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ทะเบียนรถ:</span>
+        <span>{{ d.license_plate || '-' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">หมายเหตุ:</span>
+        <span>{{ d.route_notes || '-' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">สถานะ:</span>
+        <p-tag [value]="statusLabel(d.status)" [severity]="statusSeverity(d.status)" />
+      </div>
+    </div>
+
+    <h4 class="lines-title">รายการสินค้า (FEFO)</h4>
+    <p-table [value]="d.lines" styleClass="p-datatable-sm p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Batch No.</th>
+          <th>สินค้า</th>
+          <th style="text-align:right">จำนวนที่หยิบ</th>
+          <th style="text-align:right">จำนวนที่ส่ง</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-line>
+        <tr>
+          <td><code>{{ line.batch_number }}</code></td>
+          <td>{{ line.fg_name }}</td>
+          <td style="text-align:right">{{ line.picked_qty | number:'1.0-3' }}</td>
+          <td style="text-align:right">{{ line.dispatched_qty | number:'1.0-3' }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+  <ng-template pTemplate="footer">
+    <button class="btn-secondary" (click)="showDetailDialog = false">ปิด</button>
+  </ng-template>
+</p-dialog>

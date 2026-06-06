@@ -21,6 +21,7 @@ func Setup(
 	rmInvH *handler.RMInventoryHandler,
 	prodH *handler.ProductionHandler,
 	fgInvH *handler.FGInventoryHandler,
+	salesH *handler.SalesHandler,
 ) {
 	engine.Use(middleware.CORS(), middleware.Logger())
 
@@ -180,6 +181,39 @@ func Setup(
 				orders.POST("/:id/cancel", middleware.RequirePermission("production", "update"), prodH.CancelOrder)
 			}
 			prod.GET("/yields", prodH.ListYields)
+		}
+
+		// Sales & Delivery
+		sales := protected.Group("/sales", middleware.RequirePermission("sales", "read"))
+		{
+			sales.GET("/vehicles", salesH.ListVehicles)
+
+			so := sales.Group("/orders")
+			{
+				so.GET("", salesH.ListSalesOrders)
+				so.POST("", middleware.RequirePermission("sales", "create"), salesH.CreateSalesOrder)
+				so.GET("/:id", salesH.GetSalesOrder)
+				so.PUT("/:id", middleware.RequirePermission("sales", "update"), salesH.UpdateSalesOrder)
+				so.POST("/:id/confirm", middleware.RequirePermission("sales", "update"), salesH.ConfirmSalesOrder)
+				so.POST("/:id/cancel", middleware.RequirePermission("sales", "update"), salesH.CancelSalesOrder)
+			}
+
+			doGrp := sales.Group("/delivery-orders")
+			{
+				doGrp.GET("", salesH.ListDeliveryOrders)
+				doGrp.POST("", middleware.RequirePermission("sales", "create"), salesH.CreateDeliveryOrder)
+				doGrp.GET("/:id", salesH.GetDeliveryOrder)
+				doGrp.POST("/:id/dispatch", middleware.RequirePermission("sales", "update"), salesH.DispatchDeliveryOrder)
+				doGrp.POST("/:id/deliver", middleware.RequirePermission("sales", "update"), salesH.DeliverDeliveryOrder)
+			}
+
+			inv := sales.Group("/invoices")
+			{
+				inv.GET("", salesH.ListInvoices)
+				inv.POST("", middleware.RequirePermission("sales", "create"), salesH.CreateInvoice)
+				inv.GET("/:id", salesH.GetInvoice)
+				inv.POST("/:id/pay", middleware.RequirePermission("sales", "update"), salesH.MarkInvoicePaid)
+			}
 		}
 	}
 }

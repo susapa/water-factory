@@ -1,0 +1,15 @@
+<div class="shell-header">
+  <h2 class="page-title">ขายและจัดส่ง</h2>
+  <nav class="tab-nav">
+    @if (!isDelivery()) {
+      <a routerLink="orders" routerLinkActive="active" class="tab-link">ใบสั่งขาย</a>
+      <a routerLink="deliveries" routerLinkActive="active" class="tab-link">ใบส่งสินค้า</a>
+      <a routerLink="invoices" routerLinkActive="active" class="tab-link">ใบแจ้งหนี้</a>
+    } @else {
+      <a routerLink="deliveries" routerLinkActive="active" class="tab-link">จัดส่ง</a>
+    }
+  </nav>
+</div>
+<div class="shell-content">
+  <router-outlet />
+</div>

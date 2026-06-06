@@ -46,6 +46,7 @@ func main() {
 	rmInvRepo := repository.NewRMInventoryRepo(pool)
 	prodRepo := repository.NewProductionRepo(pool)
 	fgInvRepo := repository.NewFGInventoryRepo(pool)
+	salesRepo := repository.NewSalesRepo(pool)
 
 	// Services
 	authSvc := service.NewAuthService(userRepo, jwtMgr)
@@ -54,6 +55,7 @@ func main() {
 	rmInvSvc := service.NewRMInventoryService(rmInvRepo)
 	prodSvc := service.NewProductionService(prodRepo)
 	fgInvSvc := service.NewFGInventoryService(fgInvRepo)
+	salesSvc := service.NewSalesService(salesRepo)
 
 	// Handlers
 	authH := handler.NewAuthHandler(authSvc)
@@ -62,13 +64,14 @@ func main() {
 	rmInvH := handler.NewRMInventoryHandler(rmInvSvc)
 	prodH := handler.NewProductionHandler(prodSvc)
 	fgInvH := handler.NewFGInventoryHandler(fgInvSvc)
+	salesH := handler.NewSalesHandler(salesSvc)
 
 	if cfg.App.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	engine := gin.New()
-	router.Setup(engine, jwtMgr, authH, userH, mdH, rmInvH, prodH, fgInvH)
+	router.Setup(engine, jwtMgr, authH, userH, mdH, rmInvH, prodH, fgInvH, salesH)
 
 	addr := fmt.Sprintf(":%s", cfg.App.Port)
 	log.Info().Str("addr", addr).Msg("starting server")

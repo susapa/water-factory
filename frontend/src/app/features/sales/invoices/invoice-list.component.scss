@@ -1,0 +1,52 @@
+@use '../../master-data/list-shared' as *;
+
+.date-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--surface-card);
+  color: var(--text-color);
+  &:focus { outline: none; border-color: var(--primary-color); }
+}
+
+.pay-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--surface-ground);
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  strong { font-size: 1.1rem; color: var(--primary-color); }
+}
+
+.inv-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+
+  hr { border: none; border-top: 1px solid var(--surface-border); margin: 0.5rem 0; }
+}
+
+.inv-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+
+  span:first-child { color: var(--text-color-secondary); }
+
+  &.grand {
+    font-size: 1rem;
+    strong { color: var(--primary-color); }
+  }
+
+  &.muted {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+  }
+}
