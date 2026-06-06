@@ -125,7 +125,8 @@ frontend/src/app/
 │   │   ├── master-data.model.ts                ← UOM, RawMaterial, FinishedGood, BOM, Customer, Supplier
 │   │   ├── raw-material-inventory.model.ts     ← GRN, StockLot, StockMovement, Adjustment ฯลฯ
 │   │   ├── production.model.ts                 ← ProductionOrder, ProductionRequirement, ProductionYield, DefectDetail
-│   │   └── finished-goods-inventory.model.ts   ← FGStockLot, FGStockSummary, FGAdjustment ฯลฯ
+│   │   ├── finished-goods-inventory.model.ts   ← FGStockLot, FGStockSummary, FGAdjustment ฯลฯ
+│   │   └── sales.model.ts                      ← SalesOrder, DeliveryOrder, Invoice, Vehicle, DTOs
 │   └── services/
 │       ├── master-data.service.ts              ← HTTP service สำหรับ master data
 │       ├── raw-material-inventory.service.ts   ← HTTP service สำหรับ Phase 2
