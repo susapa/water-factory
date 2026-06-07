@@ -1,0 +1,57 @@
+<div class="filter-bar">
+  <label class="filter-label">
+    ตั้งแต่ (วันที่วางแผนเริ่ม)
+    <input type="date" class="date-input" [value]="dateFrom()" (change)="dateFrom.set($any($event.target).value)" />
+  </label>
+  <label class="filter-label">
+    ถึง
+    <input type="date" class="date-input" [value]="dateTo()" (change)="dateTo.set($any($event.target).value)" />
+  </label>
+  @if (dateFrom() || dateTo()) {
+    <button class="clear-btn" (click)="dateFrom.set(''); dateTo.set('')">ล้างตัวกรอง</button>
+  }
+  <span class="result-count">{{ filtered().length }} รายการ</span>
+</div>
+
+<div class="summary-tiles">
+  <div class="summary-tile">
+    <div class="tile-value">{{ totalPlanned() | number:'1.0-2' }}</div>
+    <div class="tile-label">ปริมาณวางแผนรวม</div>
+  </div>
+  <div class="summary-tile">
+    <div class="tile-value">{{ totalYield() | number:'1.0-2' }}</div>
+    <div class="tile-label">ผลผลิตจริงรวม</div>
+  </div>
+  <div class="summary-tile summary-tile--warn">
+    <div class="tile-value">{{ totalDefect() | number:'1.0-2' }}</div>
+    <div class="tile-label">ของเสียรวม</div>
+  </div>
+</div>
+
+<p-table [value]="filtered()" [loading]="loading()" [tableStyle]="{'min-width':'55rem'}" styleClass="p-datatable-sm">
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="order_number">เลขที่ใบสั่งผลิต <p-sortIcon field="order_number" /></th>
+      <th pSortableColumn="fg_name">สินค้า <p-sortIcon field="fg_name" /></th>
+      <th pSortableColumn="planned_qty" style="text-align:right">ปริมาณวางแผน <p-sortIcon field="planned_qty" /></th>
+      <th pSortableColumn="actual_yield_qty" style="text-align:right">ผลผลิตจริง <p-sortIcon field="actual_yield_qty" /></th>
+      <th style="text-align:right">ของเสีย</th>
+      <th>สถานะ</th>
+      <th pSortableColumn="planned_start_date">วันที่เริ่มวางแผน <p-sortIcon field="planned_start_date" /></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-row>
+    <tr>
+      <td>{{ row.order_number }}</td>
+      <td>{{ row.fg_name }}</td>
+      <td style="text-align:right">{{ row.planned_qty | number:'1.0-2' }}</td>
+      <td style="text-align:right">{{ row.actual_yield_qty | number:'1.0-2' }}</td>
+      <td style="text-align:right">{{ row.defect_qty | number:'1.0-2' }}</td>
+      <td><p-tag [value]="row.status" [severity]="statusSeverity(row.status)" /></td>
+      <td>{{ row.planned_start_date ?? '-' }}</td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-color-secondary)">ไม่มีข้อมูลใบสั่งผลิต</td></tr>
+  </ng-template>
+</p-table>

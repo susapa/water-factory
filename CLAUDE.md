@@ -70,7 +70,8 @@ backend/
 │   │   ├── raw_material_inventory.go  ← GRN, StockLot, StockMovement, Adjustment ฯลฯ
 │   │   ├── production.go       ← ProductionOrder, ProductionRequirement, ProductionYield, DefectDetail
 │   │   ├── fg_inventory.go     ← FGStockLot, FGStockMovement, FGStockSummary, FGAdjustment ฯลฯ
-│   │   └── sales.go            ← SalesOrder, SalesOrderLine, Vehicle, DeliveryOrder, DeliveryOrderLine, Invoice
+│   │   ├── sales.go            ← SalesOrder, SalesOrderLine, Vehicle, DeliveryOrder, DeliveryOrderLine, Invoice
+│   │   └── dashboard.go        ← DashboardSummary, DailySales, FGExpiringSoonItem
 │   ├── dto/
 │   │   ├── auth_dto.go
 │   │   ├── master_data_dto.go  ← Create/Update requests for all master data
@@ -85,7 +86,8 @@ backend/
 │   │   ├── production_repo.go         ← ConfirmOrder (BOM explosion), IssueRM (FIFO), RecordYield transactions
 │   │   │                                   RecordYield ยัง insert fg_stock_lot + PRODUCTION_RECEIPT movement ด้วย
 │   │   ├── fg_inventory_repo.go       ← ListStockSummary, ListStockLots, GetStockLotDetail, Adjustment CRUD
-│   │   └── sales_repo.go              ← SO CRUD+confirm/cancel, DO create(FEFO)+dispatch+deliver, Invoice create+pay
+│   │   ├── sales_repo.go              ← SO CRUD+confirm/cancel, DO create(FEFO)+dispatch+deliver, Invoice create+pay
+│   │   └── dashboard_repo.go          ← GetSummary() — 4 aggregate queries, read-only
 │   ├── service/
 │   │   ├── auth_service.go
 │   │   ├── user_service.go
@@ -93,7 +95,8 @@ backend/
 │   │   ├── raw_material_inventory_service.go
 │   │   ├── production_service.go
 │   │   ├── fg_inventory_service.go
-│   │   └── sales_service.go
+│   │   ├── sales_service.go
+│   │   └── dashboard_service.go
 │   └── handler/
 │       ├── auth_handler.go
 │       ├── user_handler.go
@@ -101,7 +104,8 @@ backend/
 │       ├── raw_material_inventory_handler.go  ← 15 handlers พร้อม Swagger annotations
 │       ├── production_handler.go          ← 11 handlers พร้อม Swagger annotations
 │       ├── fg_inventory_handler.go        ← 8 handlers พร้อม Swagger annotations
-│       └── sales_handler.go               ← 13 handlers พร้อม Swagger annotations
+│       ├── sales_handler.go               ← 13 handlers พร้อม Swagger annotations
+│       └── dashboard_handler.go           ← 1 handler: GetSummary
 ├── pkg/
 │   ├── jwt/jwt.go
 │   ├── number/generator.go     ← doc number: GRN-YYYYMMDD-00001, PO-YYYYMMDD-00001 ฯลฯ
@@ -126,13 +130,15 @@ frontend/src/app/
 │   │   ├── raw-material-inventory.model.ts     ← GRN, StockLot, StockMovement, Adjustment ฯลฯ
 │   │   ├── production.model.ts                 ← ProductionOrder, ProductionRequirement, ProductionYield, DefectDetail
 │   │   ├── finished-goods-inventory.model.ts   ← FGStockLot, FGStockSummary, FGAdjustment ฯลฯ
-│   │   └── sales.model.ts                      ← SalesOrder, DeliveryOrder, Invoice, Vehicle, DTOs
+│   │   ├── sales.model.ts                      ← SalesOrder, DeliveryOrder, Invoice, Vehicle, DTOs
+│   │   └── dashboard.model.ts                  ← DashboardSummary, DailySales, FGExpiringSoonItem
 │   └── services/
 │       ├── master-data.service.ts              ← HTTP service สำหรับ master data
 │       ├── raw-material-inventory.service.ts   ← HTTP service สำหรับ Phase 2
 │       ├── production.service.ts               ← HTTP service สำหรับ Phase 3
 │       ├── finished-goods-inventory.service.ts ← HTTP service สำหรับ Phase 4
 │       ├── sales.service.ts                    ← HTTP service สำหรับ Phase 5
+│       ├── dashboard.service.ts                ← getDashboardSummary() สำหรับ Phase 6
 │       └── user.service.ts                     ← listUsers, createUser, setUserActive, listRoles
 ├── layout/
 │   ├── layout.component.ts/html/scss
@@ -140,7 +146,7 @@ frontend/src/app/
 │   └── topbar/                 ← user info + logout
 └── features/
     ├── auth/login/             ← login page (Reactive Forms)
-    ├── dashboard/              ← placeholder (Phase 6)
+    ├── dashboard/              ← ✅ Phase 6 เสร็จแล้ว — KPI tiles + bar/donut charts + expiry alerts
     ├── master-data/            ← ✅ Phase 1 เสร็จแล้ว
     │   ├── master-data-shell.component.*   ← tab navigation
     │   ├── master-data.routes.ts
@@ -172,7 +178,12 @@ frontend/src/app/
     │   ├── orders/so-list.component.*   ← SO create/confirm/cancel + FormArray lines + totals
     │   ├── deliveries/do-list.component.*  ← DO create(FEFO auto-pick)+dispatch+deliver
     │   └── invoices/invoice-list.component.*  ← invoice create+pay
-    ├── reports/                ← placeholder (Phase 6)
+    ├── reports/                ← ✅ Phase 6 เสร็จแล้ว
+    │   ├── reports-shell.component.*  ← tab navigation (3 tabs)
+    │   ├── reports.routes.ts
+    │   ├── stock/stock-report.component.*      ← RM + FG stock tables
+    │   ├── sales/sales-report.component.*      ← SO list + date filter + total footer
+    │   └── production/production-report.component.*  ← PO list + summary tiles + date filter
     └── admin/                  ← ✅ Phase 0 เสร็จแล้ว
         └── user-list.component.*  ← ตาราง users + dialog เพิ่มผู้ใช้ + toggle active
 ```
@@ -303,8 +314,10 @@ GET  /api/v1/sales/invoices/:id
 POST /api/v1/sales/invoices/:id/pay        → status=paid
 ```
 
-## Phase ที่เหลือ
-- **Phase 6 (ต่อไป):** Dashboard — KPI tiles, PrimeNG charts, reports
+### Phase 6 — Dashboard (dashboard:read permission — admin, warehouse_manager, production_manager, sales_admin)
+```
+GET  /api/v1/dashboard/summary   ← KPI counts + sales_last_7_days[] + po_status_counts{} + fg_expiring_soon[]
+```
 
 ## หน้า Frontend ที่เสร็จแล้ว
 | หน้า | Route | Roles |
@@ -316,6 +329,8 @@ POST /api/v1/sales/invoices/:id/pay        → status=paid
 | การผลิต (2 tabs) | /production | admin, warehouse_manager, production_manager |
 | คลังสินค้าสำเร็จรูป (2 tabs) | /finished-goods | admin, warehouse_manager, sales_admin |
 | ขายและจัดส่ง (3 tabs / 1 tab delivery) | /sales | admin, sales_admin, delivery |
+| แดชบอร์ด | /dashboard | admin, warehouse_manager, production_manager, sales_admin |
+| รายงาน (3 tabs: สต็อก/ยอดขาย/การผลิต) | /reports | admin, warehouse_manager, production_manager, sales_admin |
 
 ## Database Tables (ทั้งหมด applied แล้ว)
 Migration 001: roles, users, refresh_tokens, sequences
@@ -345,6 +360,8 @@ Migration 007: fg_adjustments, fg_adjustment_lines
 - PrimeNG theme package: `@primeng/themes` (install แล้ว), preset ที่ใช้: **Aura**
 - `MessageService` ต้อง provide ใน component `providers: [MessageService]` ไม่ใช้ root
 - `ConfirmationService` ต้อง provide ใน component `providers: [ConfirmationService]` พร้อมเพิ่ม `<p-confirmDialog />` ใน template
+- **`Object.keys()` ใช้ใน Angular template ไม่ได้** — ถ้าต้องเช็ค empty object ให้ทำเป็น `computed()` signal แทน เช่น `hasCounts = computed(() => Object.keys(this.data()?.map ?? {}).length > 0)`
+- **`chart.js` ต้อง install แยก** — `npm install chart.js` (PrimeNG `p-chart` ไม่ bundle มาด้วย)
 
 ### Go / Backend
 - Go list functions ต้อง `make([]*T, 0)` ไม่ใช้ `var items []*T` — Go nil slice serialize เป็น JSON `null` ทำให้ Angular พัง
@@ -365,3 +382,6 @@ Migration 007: fg_adjustments, fg_adjustment_lines
 - **Sales DO dispatch** transaction: update fg_stock_lots.current_qty → insert fg_stock_movements(SALES_DISPATCH) → update SO status=dispatched
 - `number.Next(ctx, pool, "SO")` → `SO-YYYYMMDD-00001`, `"DO"` → `DO-...`, `"INV"` → `INV-...` (auto-insert ลงใน sequences table)
 - **delivery role** เห็นแค่ tab "จัดส่ง" (deliveries) ใน sales shell — ซ่อน orders + invoices ด้วย `isDelivery()` computed signal
+- **dashboard_repo.go** ใช้ 4 queries แยกกัน (ไม่ใช้ transaction เพราะ read-only): COUNT pending SO/PO/DO, SUM invoices, generate_series สำหรับ 7-day sales, GROUP BY status สำหรับ PO chart, และ JOIN fg_stock_lots+finished_goods สำหรับ expiry alerts
+- **`dashboard.service.ts` ต้องใช้ `environment.apiUrl`** (absolute URL `http://localhost:8080/api/v1`) — ห้ามใช้ relative path `/api/v1/...` เพราะ Angular dev server ไม่มี proxy config จะ return HTML แทน JSON
+- **`dashboard:read` permission** อยู่ใน `rbac.go` แล้วสำหรับ 4 roles: admin, warehouse_manager, production_manager, sales_admin — ไม่ต้องแก้ rbac.go

@@ -1,0 +1,69 @@
+<div class="report-section">
+  <h3 class="section-title">สต็อกวัตถุดิบ</h3>
+  <p-table [value]="rmSummary()" [loading]="loading()" [tableStyle]="{'min-width':'50rem'}" styleClass="p-datatable-sm">
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="rm_code">รหัส <p-sortIcon field="rm_code" /></th>
+        <th pSortableColumn="rm_name">ชื่อวัตถุดิบ <p-sortIcon field="rm_name" /></th>
+        <th>หน่วย</th>
+        <th pSortableColumn="total_qty" style="text-align:right">จำนวนคงเหลือ <p-sortIcon field="total_qty" /></th>
+        <th style="text-align:right">จำนวน Lot</th>
+        <th>วันหมดอายุใกล้สุด</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-row>
+      <tr>
+        <td>{{ row.rm_code }}</td>
+        <td>{{ row.rm_name }}</td>
+        <td>{{ row.uom_code }}</td>
+        <td style="text-align:right">{{ row.total_qty | number:'1.0-2' }}</td>
+        <td style="text-align:right">{{ row.lot_count }}</td>
+        <td>
+          @if (row.earliest_expiry) {
+            <p-tag [value]="row.earliest_expiry" [severity]="expiryTagSeverity(row.earliest_expiry)" />
+          } @else {
+            <span style="color:var(--text-color-secondary)">-</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-color-secondary)">ไม่มีข้อมูลสต็อกวัตถุดิบ</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div class="report-section">
+  <h3 class="section-title">สต็อกสินค้าสำเร็จรูป</h3>
+  <p-table [value]="fgSummary()" [tableStyle]="{'min-width':'50rem'}" styleClass="p-datatable-sm">
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="fg_code">รหัส <p-sortIcon field="fg_code" /></th>
+        <th pSortableColumn="fg_name">ชื่อสินค้า <p-sortIcon field="fg_name" /></th>
+        <th>หน่วย</th>
+        <th pSortableColumn="total_qty" style="text-align:right">จำนวนคงเหลือ <p-sortIcon field="total_qty" /></th>
+        <th style="text-align:right">จำนวน Lot</th>
+        <th>วันหมดอายุใกล้สุด</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-row>
+      <tr>
+        <td>{{ row.fg_code }}</td>
+        <td>{{ row.fg_name }}</td>
+        <td>{{ row.uom_code }}</td>
+        <td style="text-align:right">{{ row.total_qty | number:'1.0-2' }}</td>
+        <td style="text-align:right">{{ row.lot_count }}</td>
+        <td>
+          @if (row.nearest_expiry) {
+            <p-tag [value]="row.nearest_expiry" [severity]="expiryTagSeverity(row.nearest_expiry)" />
+          } @else {
+            <span style="color:var(--text-color-secondary)">-</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-color-secondary)">ไม่มีข้อมูลสต็อกสินค้าสำเร็จรูป</td></tr>
+    </ng-template>
+  </p-table>
+</div>

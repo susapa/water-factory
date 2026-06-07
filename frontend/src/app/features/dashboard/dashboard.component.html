@@ -1,9 +1,86 @@
-<div class="dashboard-header">
-  <h2>แดชบอร์ด</h2>
-  <p>ยินดีต้อนรับ {{ user()?.full_name }}</p>
+<p-toast />
+
+<div class="page-header">
+  <h2 class="page-title">แดชบอร์ด</h2>
 </div>
 
-<div class="coming-soon">
-  <span class="pi pi-chart-bar" style="font-size: 3rem; color: var(--primary-color)"></span>
-  <p>KPI tiles และรายงานกำลังพัฒนา (Phase 6)</p>
+<!-- KPI Tiles -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-icon pi pi-shopping-cart"></div>
+    <div class="kpi-value">{{ summary()?.pending_so_count ?? 0 }}</div>
+    <div class="kpi-label">คำสั่งขายรอดำเนินการ</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon pi pi-cog"></div>
+    <div class="kpi-value">{{ summary()?.in_progress_po_count ?? 0 }}</div>
+    <div class="kpi-label">การผลิตกำลังดำเนินการ</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-icon pi pi-truck"></div>
+    <div class="kpi-value">{{ summary()?.pending_do_count ?? 0 }}</div>
+    <div class="kpi-label">จัดส่งรอดำเนินการ</div>
+  </div>
+  <div class="kpi-card kpi-card--accent">
+    <div class="kpi-icon pi pi-file-invoice"></div>
+    <div class="kpi-value">{{ summary()?.issued_invoice_count ?? 0 }}</div>
+    <div class="kpi-label">ใบแจ้งหนี้ค้างชำระ</div>
+    @if (summary()?.issued_invoice_total) {
+      <div class="kpi-sub">{{ summary()!.issued_invoice_total | number:'1.2-2' }} บาท</div>
+    }
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="section-title">ยอดขาย 7 วันล่าสุด</div>
+    <div class="chart-wrap">
+      <p-chart type="bar" [data]="barChartData()" [options]="barChartOptions" height="250" />
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="section-title">สถานะใบสั่งผลิต</div>
+    <div class="chart-wrap">
+      @if (hasPOCounts()) {
+        <p-chart type="doughnut" [data]="donutChartData()" [options]="donutChartOptions" height="250" />
+      } @else {
+        <div class="empty-chart">ไม่มีข้อมูลใบสั่งผลิต</div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- FG Expiring Soon -->
+<div class="alert-card">
+  <div class="section-title">
+    <span class="pi pi-exclamation-triangle" style="color: var(--orange-500); margin-right: 0.5rem;"></span>
+    สินค้าสำเร็จรูปใกล้หมดอายุ (ภายใน 7 วัน)
+  </div>
+  @if (loading()) {
+    <div class="loading-text">กำลังโหลด...</div>
+  } @else if ((summary()?.fg_expiring_soon ?? []).length === 0) {
+    <div class="empty-text">ไม่มีสินค้าที่ใกล้หมดอายุในช่วง 7 วันข้างหน้า</div>
+  } @else {
+    <p-table [value]="summary()!.fg_expiring_soon" [tableStyle]="{'min-width': '40rem'}">
+      <ng-template #header>
+        <tr>
+          <th>Batch</th>
+          <th>สินค้า</th>
+          <th style="text-align:right">จำนวนคงเหลือ</th>
+          <th>วันหมดอายุ</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ item.lot_number }}</td>
+          <td>{{ item.fg_name }}</td>
+          <td style="text-align:right">{{ item.qty | number:'1.0-2' }}</td>
+          <td>
+            <p-tag [value]="item.expiry_date" severity="warn" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
 </div>
