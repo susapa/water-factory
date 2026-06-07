@@ -1,25 +1,106 @@
-.dashboard-header {
+.page-header {
   margin-bottom: 1.5rem;
-
-  h2 {
-    margin: 0 0 0.25rem;
-  }
-
-  p {
-    color: var(--text-color-secondary);
-    margin: 0;
-  }
 }
 
-.coming-soon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem;
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+// KPI tiles row
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: 8px;
-  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &--accent {
+    border-left: 4px solid var(--primary-color);
+  }
+}
+
+.kpi-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.8125rem;
   color: var(--text-color-secondary);
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+// Charts
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.chart-wrap {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-chart {
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+
+// Alert section
+.alert-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.section-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.loading-text,
+.empty-text {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+  padding: 1rem 0;
 }

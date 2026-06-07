@@ -22,6 +22,7 @@ func Setup(
 	prodH *handler.ProductionHandler,
 	fgInvH *handler.FGInventoryHandler,
 	salesH *handler.SalesHandler,
+	dashboardH *handler.DashboardHandler,
 ) {
 	engine.Use(middleware.CORS(), middleware.Logger())
 
@@ -181,6 +182,12 @@ func Setup(
 				orders.POST("/:id/cancel", middleware.RequirePermission("production", "update"), prodH.CancelOrder)
 			}
 			prod.GET("/yields", prodH.ListYields)
+		}
+
+		// Dashboard
+		dash := protected.Group("/dashboard", middleware.RequirePermission("dashboard", "read"))
+		{
+			dash.GET("/summary", dashboardH.GetSummary)
 		}
 
 		// Sales & Delivery
