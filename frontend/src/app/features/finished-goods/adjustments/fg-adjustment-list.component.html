@@ -69,7 +69,7 @@
       </div>
       <div class="form-field">
         <label>ประเภท <span class="req">*</span></label>
-        <p-select formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" />
+        <p-select appendTo="body" formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" />
       </div>
       <div class="form-field full-width">
         <label>หมายเหตุ</label>
@@ -110,7 +110,7 @@
               <span></span>
             } @else {
               <div class="form-field" style="margin:0">
-                <p-select formControlName="fg_stock_lot_id" [options]="lots()" optionLabel="batch_number" optionValue="id"
+                <p-select appendTo="body" formControlName="fg_stock_lot_id" [options]="lots()" optionLabel="batch_number" optionValue="id"
                   placeholder="เลือก Lot" [filter]="true" filterBy="batch_number,fg_code,fg_name" />
                 @if (line.get('fg_stock_lot_id')?.invalid && line.get('fg_stock_lot_id')?.touched) {
                   <small class="error">กรุณาเลือก Lot</small>

@@ -69,7 +69,7 @@
       </div>
       <div class="form-field">
         <label>ประเภท <span class="req">*</span></label>
-        <p-select formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" />
+        <p-select appendTo="body" formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" />
       </div>
       <div class="form-field full-width">
         <label>หมายเหตุ</label>
@@ -110,7 +110,7 @@
               <span></span>
             } @else {
               <div class="form-field" style="margin:0">
-                <p-select formControlName="rm_stock_lot_id" [options]="lots()" optionLabel="lot_number" optionValue="id"
+                <p-select appendTo="body" formControlName="rm_stock_lot_id" [options]="lots()" optionLabel="lot_number" optionValue="id"
                   placeholder="เลือก Lot" [filter]="true" filterBy="lot_number,rm_code,rm_name"
                   [optionLabel]="'lot_number'" />
                 @if (line.get('rm_stock_lot_id')?.invalid && line.get('rm_stock_lot_id')?.touched) {

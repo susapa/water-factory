@@ -56,7 +56,7 @@
     <div class="form-grid">
       <div class="form-field">
         <label>ซัพพลายเออร์</label>
-        <p-select formControlName="supplier_id" [options]="suppliers()" optionLabel="name" optionValue="id"
+        <p-select appendTo="body" formControlName="supplier_id" [options]="suppliers()" optionLabel="name" optionValue="id"
           placeholder="เลือกซัพพลายเออร์" [filter]="true" filterBy="name,code" [showClear]="true" />
       </div>
       <div class="form-field">
@@ -101,7 +101,7 @@
         @for (line of lines.controls; track $index) {
           <div [formGroupName]="$index" class="grn-line-row">
             <div class="form-field" style="margin:0">
-              <p-select formControlName="raw_material_id" [options]="rawMaterials()"
+              <p-select appendTo="body" formControlName="raw_material_id" [options]="rawMaterials()"
                 optionLabel="name" optionValue="id" placeholder="เลือกวัตถุดิบ"
                 [filter]="true" filterBy="name,code" />
               @if (line.get('raw_material_id')?.invalid && line.get('raw_material_id')?.touched) {
@@ -119,7 +119,7 @@
             <p-inputnumber formControlName="unit_cost" placeholder="0.0000"
               [minFractionDigits]="0" [maxFractionDigits]="4" [min]="0" />
             <input type="date" formControlName="expiry_date" class="line-input date-input" />
-            <p-select formControlName="location_id" [options]="locationOptions()"
+            <p-select appendTo="body" formControlName="location_id" [options]="locationOptions()"
               optionLabel="label" optionValue="value" placeholder="ตำแหน่ง" [showClear]="true" />
             <input pInputText formControlName="notes" placeholder="หมายเหตุ" class="line-input" />
             @if (!viewOnly) {

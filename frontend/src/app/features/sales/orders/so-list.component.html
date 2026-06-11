@@ -65,7 +65,7 @@
       <div class="form-field">
         <label>ลูกค้า <span class="req">*</span></label>
         @if (!viewOnly) {
-          <p-select formControlName="customer_id" [options]="customers()" optionLabel="name" optionValue="id"
+          <p-select appendTo="body" formControlName="customer_id" [options]="customers()" optionLabel="name" optionValue="id"
             placeholder="เลือกลูกค้า" [filter]="true" filterBy="name" />
         } @else {
           <div class="view-value">{{ editingOrder()?.customer_name }}</div>
@@ -133,7 +133,7 @@
               <span style="text-align:right">{{ editingOrder()!.lines[$index]?.discount_pct }}%</span>
               <span style="text-align:right">{{ editingOrder()!.lines[$index]?.line_total | number:'1.2-2' }}</span>
             } @else {
-              <p-select formControlName="finished_good_id" [options]="fgOptions()" optionLabel="name" optionValue="id"
+              <p-select appendTo="body" formControlName="finished_good_id" [options]="fgOptions()" optionLabel="name" optionValue="id"
                 placeholder="เลือกสินค้า" [filter]="true" filterBy="name,code" />
               <p-inputnumber formControlName="ordered_qty" placeholder="0.000" [minFractionDigits]="0" [maxFractionDigits]="3" [min]="0.001" />
               <p-inputnumber formControlName="unit_price"  placeholder="0.00"  [minFractionDigits]="2" [maxFractionDigits]="4" [min]="0" />
