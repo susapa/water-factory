@@ -52,7 +52,7 @@
     </div>
     <div class="form-field">
       <label>หน่วยนับ <span class="req">*</span></label>
-      <p-select formControlName="uom_id" [options]="uoms()" optionLabel="code" optionValue="id" placeholder="เลือกหน่วย" />
+      <p-select appendTo="body" formControlName="uom_id" [options]="uoms()" optionLabel="code" optionValue="id" placeholder="เลือกหน่วย" />
       @if (form.get('uom_id')?.invalid && form.get('uom_id')?.touched) { <small class="error">กรุณาเลือกหน่วยนับ</small> }
     </div>
     <div class="form-field">

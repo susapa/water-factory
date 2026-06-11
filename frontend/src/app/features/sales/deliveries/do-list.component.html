@@ -63,7 +63,7 @@
     <div class="form-grid">
       <div class="form-field full-width">
         <label>ใบสั่งขาย (SO) <span class="req">*</span></label>
-        <p-select formControlName="sales_order_id" [options]="soOptions()" optionLabel="label" optionValue="id"
+        <p-select appendTo="body" formControlName="sales_order_id" [options]="soOptions()" optionLabel="label" optionValue="id"
           placeholder="เลือก SO ที่ยืนยันแล้ว" [filter]="true" filterBy="label" />
         @if (form.get('sales_order_id')?.invalid && form.get('sales_order_id')?.touched) {
           <small class="error">กรุณาเลือก SO</small>
@@ -75,7 +75,7 @@
       </div>
       <div class="form-field">
         <label>รถที่ใช้จัดส่ง</label>
-        <p-select formControlName="vehicle_id" [options]="vehicleOptions()" optionLabel="label" optionValue="id"
+        <p-select appendTo="body" formControlName="vehicle_id" [options]="vehicleOptions()" optionLabel="label" optionValue="id"
           placeholder="เลือกรถ (ถ้ามี)" [showClear]="true" />
       </div>
       <div class="form-field full-width">

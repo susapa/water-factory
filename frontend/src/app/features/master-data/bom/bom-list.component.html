@@ -43,7 +43,7 @@
     <div class="form-grid">
       <div class="form-field full-width">
         <label>สินค้าสำเร็จรูป <span class="req">*</span></label>
-        <p-select formControlName="finished_good_id" [options]="finishedGoods()" optionLabel="name" optionValue="id"
+        <p-select appendTo="body" formControlName="finished_good_id" [options]="finishedGoods()" optionLabel="name" optionValue="id"
           placeholder="เลือกสินค้า" [filter]="true" filterBy="name,code" />
         @if (form.get('finished_good_id')?.invalid && form.get('finished_good_id')?.touched) {
           <small class="error">กรุณาเลือกสินค้าสำเร็จรูป</small>
@@ -90,7 +90,7 @@
         @for (line of lines.controls; track $index) {
           <div [formGroupName]="$index" class="line-row">
             <div class="form-field" style="margin:0">
-              <p-select formControlName="raw_material_id" [options]="rawMaterials()"
+              <p-select appendTo="body" formControlName="raw_material_id" [options]="rawMaterials()"
                 optionLabel="name" optionValue="id" placeholder="เลือกวัตถุดิบ"
                 [filter]="true" filterBy="name,code" />
               @if (line.get('raw_material_id')?.invalid && line.get('raw_material_id')?.touched) {

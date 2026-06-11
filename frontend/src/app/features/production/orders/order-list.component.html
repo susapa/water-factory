@@ -95,13 +95,13 @@
     <div class="form-grid">
       <div class="form-field">
         <label>สินค้าสำเร็จรูป <span class="req">*</span></label>
-        <p-select formControlName="finished_good_id"
+        <p-select appendTo="body" formControlName="finished_good_id"
           [options]="fgOptions()" optionLabel="name" optionValue="id"
           placeholder="เลือกสินค้าสำเร็จรูป" [filter]="true" filterBy="name,code" />
       </div>
       <div class="form-field">
         <label>BOM</label>
-        <p-select formControlName="bom_id"
+        <p-select appendTo="body" formControlName="bom_id"
           [options]="filteredBoms()" optionLabel="fg_name" optionValue="id"
           [placeholder]="filteredBoms().length ? 'เลือก BOM' : 'เลือก FG ก่อน'"
           [showClear]="true">

@@ -71,7 +71,7 @@
 
     <div class="form-field full-width">
       <label>บทบาท <span class="req">*</span></label>
-      <p-select formControlName="role_id" [options]="roles()" optionLabel="description" optionValue="id"
+      <p-select appendTo="body" formControlName="role_id" [options]="roles()" optionLabel="description" optionValue="id"
         placeholder="เลือกบทบาท" />
       @if (form.get('role_id')?.invalid && form.get('role_id')?.touched) {
         <small class="error">กรุณาเลือกบทบาท</small>

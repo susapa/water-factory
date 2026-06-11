@@ -40,16 +40,42 @@ h1, h2, h3, h4 { margin-top: 0; }
   padding: 0.5rem 0.75rem;
 }
 
-/* ── PrimeNG select / dropdown full width inside form ── */
-.form-field p-select .p-select,
-.form-field p-select {
+/* ── PrimeNG select: full width everywhere ── */
+p-select {
+  display: block;
   width: 100%;
+}
+
+p-select .p-select {
+  width: 100%;
+}
+
+/* ── PrimeNG select: show full label text ── */
+.p-select-label {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+}
+
+/* ── PrimeNG select: clear icon always vertically centered ── */
+.p-select-clear-icon {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  flex-shrink: 0;
 }
 
 /* ── PrimeNG inputnumber full width inside form ── */
 .form-field p-inputnumber,
 .form-field p-inputnumber .p-inputnumber {
   width: 100%;
+}
+
+/* ── PrimeNG select overlay above dialog ── */
+.p-select-overlay {
+  z-index: 10000 !important;
 }
 
 /* ── PrimeNG toast z-index ── */
