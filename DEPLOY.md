@@ -95,8 +95,8 @@ This builds the backend (Go) and frontend (Angular + nginx) images and starts al
 ## 5. Verify
 
 - Frontend: `http://<vps-ip>/`
-- Backend health check: `http://<vps-ip>:8080/health`
 - Login with the seeded admin: `admin@water.local` / `Admin@1234` (change this password after first login)
+- Backend health check (only reachable inside the VPS, since port 8080 isn't published — see Firewall below): `curl http://localhost:8080/health` on the VPS itself, or `docker compose logs backend`
 
 ## Operations
 
@@ -128,7 +128,7 @@ Only these ports need to be open to the internet:
 - `22` — SSH
 - `80` — frontend (nginx serves the SPA and proxies `/api/` to the backend)
 
-`8080` (backend) and `5432` (postgres) are only used internally between containers — you can drop the `ports:` mappings for them in `docker-compose.yml` once you've verified the deploy works, or firewall them off with `ufw`:
+`8080` (backend) and `5432` (postgres) are **not published** in `docker-compose.yml` — they're only reachable between containers over the internal `water_net` network. Note: Docker manages its own iptables rules for any port it *does* publish, which bypass `ufw` — so don't add `ports:` mappings back for these without also restricting them (e.g. bind to `127.0.0.1:8080:8080` instead of `8080:8080`, or use `ufw-docker`).
 
 ```bash
 sudo ufw allow 22/tcp
