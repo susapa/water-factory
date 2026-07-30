@@ -1,0 +1,10 @@
+.env
+.env.*
+*.log
+bin/
+tmp/
+seed_demo_data.sql
+seed_test_data.sql
+.git
+.gitignore
+*.md
