@@ -1,6 +1,6 @@
 # Deploying to a VPS (Docker Compose)
 
-Plain HTTP deploy — no domain/SSL required. Point a browser at `http://<vps-ip>/`.
+Deploy over plain HTTP first (`http://<vps-ip>/`), then optionally add HTTPS via Caddy + sslip.io (step 6) once the app is verified working.
 
 ## 0. Provision the VPS
 
@@ -97,6 +97,39 @@ This builds the backend (Go) and frontend (Angular + nginx) images and starts al
 - Frontend: `http://<vps-ip>/`
 - Login with the seeded admin: `admin@water.local` / `Admin@1234` (change this password after first login)
 - Backend health check (only reachable inside the VPS, since port 8080 isn't published — see Firewall below): `curl http://localhost:8080/health` on the VPS itself, or `docker compose logs backend`
+
+## 6. (Optional) HTTPS with Caddy + sslip.io
+
+No domain? [sslip.io](https://sslip.io) gives you one for free — `<dashes-instead-of-dots>.sslip.io` always resolves to that IP, e.g. `139-59-235-253.sslip.io` → `139.59.235.253`. Caddy uses it to get a real Let's Encrypt certificate automatically, with no config beyond a hostname.
+
+The frontend container binds to `127.0.0.1:8081` (not `0.0.0.0:80`) precisely so Caddy can own ports 80/443 on the host and proxy to it internally — see `docker-compose.yml`.
+
+Install Caddy:
+
+```bash
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install -y caddy
+```
+
+Point it at your VPS's sslip.io hostname (replace dots with dashes in the IP):
+
+```bash
+echo '<vps-ip-with-dashes>.sslip.io {
+    reverse_proxy 127.0.0.1:8081
+}' | sudo tee /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+```
+
+Open port 443:
+
+```bash
+sudo ufw allow 443/tcp
+```
+
+Now `https://<vps-ip-with-dashes>.sslip.io/` serves the app with a valid cert (auto-renewed by Caddy) and no browser warning; `http://` on the same host redirects to `https://` automatically.
 
 ## Operations
 
